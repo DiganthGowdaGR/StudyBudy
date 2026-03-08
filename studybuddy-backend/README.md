@@ -1,53 +1,51 @@
-# StudyBuddy REST API
+# StudyBuddy Backend: FastAPI RAG Middleware
 
-## Setup
+High-performance asynchronous API designed for document intelligence, vector retrieval, and LLM orchestration.
 
-Create and activate a virtual environment:
+## CORE TECHNOLOGIES
+- **Framework**: FastAPI (Pydantic v2)
+- **Intelligence**: LangChain, Groq (Llama-3.3-70b-versatile)
+- **Storage**: Supabase (PostgreSQL), Local FAISS (Vector Store)
+- **Processing**: PyMuPDF (PDF Extraction), Whisper (Audio)
 
+## DATA MODELS (SCHEMAS)
+| Schema | Use Case |
+|:---|:---|
+| `StudentBase` | Identity management and login |
+| `ChatRequest` | Contextual RAG prompting |
+| `NotesRequest` | Multi-mode (Web/Research/PDF) synthesis |
+| `FlashcardResponse` | AI-generated study aids |
+
+## SYSTEM WORKFLOW (RAG)
+1. **Document Loading**: `PyMuPDFLoader` parses raw PDF data.
+2. **Text Splitting**: `RecursiveCharacterTextSplitter` ensures chunk size is optimized for LLM context windows.
+3. **Embeddings**: Utilizes high-dimensional vector representations for semantic search.
+4. **Context Injection**: Retrieves top-k relevant fragments to ground LLM responses, preventing hallucination.
+
+## INSTALLATION & EXECUTION
 ```bash
+# Environment
 python -m venv .venv
-.venv\Scripts\activate          # Windows
-# source .venv/bin/activate     # macOS/Linux
-```
+.\.venv\Scripts\activate
 
-Install dependencies:
-
-```bash
+# Dependencies
 pip install -r requirements.txt
+
+# Environment Configuration (.env)
+GROQ_API_KEY=gsk_...
+SUPABASE_URL=https://...
+SUPABASE_ANON_KEY=...
+
+# Production Server
+uvicorn main:app --host 127.0.0.1 --port 8000 --workers 4
 ```
 
-Add a `.env` file with your keys (copy from `.env.example`):
+## FEATURE SET & ENDPOINTS
+- **Student API**: Management of profiles and session persistence.
+- **RAG API**: PDF ingestion and semantic querying.
+- **Notes API**: Multi-strategy synthesis (PDF/Research/Web).
+- **Voice API**: Real-time STT/TTS processing.
 
-```
-GROQ_API_KEY=your_groq_api_key
-ELEVENLABS_API_KEY=your_elevenlabs_api_key
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-## Run
-
-```bash
-uvicorn main:app --reload
-```
-
-## Endpoints
-
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| GET | / | Health check |
-| POST | /api/student/register | Register new student |
-| POST | /api/student/login | Login by email |
-| GET | /api/student/{student_id} | Get student by ID |
-| POST | /api/upload | Upload PDF, process with RAG |
-| GET | /api/documents/{student_id} | List all uploaded resources |
-| PUT | /api/documents/{student_id}/{document_id} | Update document metadata |
-| DELETE | /api/documents/{student_id}/{document_id} | Delete document |
-| POST | /api/chat | Chat with RAG context |
-| GET | /api/talks/{student_id} | List chat/voice talks |
-| DELETE | /api/talks/{student_id}/{talk_id} | Delete one talk |
-| DELETE | /api/talks/{student_id} | Delete all talks |
-| GET | /api/flashcards/{student_id} | List flashcards |
 | POST | /api/flashcards | Create flashcard |
 | PATCH | /api/flashcards/{student_id}/{flashcard_id} | Update flashcard |
 | DELETE | /api/flashcards/{student_id}/{flashcard_id} | Delete flashcard |
