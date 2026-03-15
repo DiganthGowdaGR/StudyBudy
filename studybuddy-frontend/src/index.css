@@ -380,3 +380,222 @@ input:focus, textarea:focus, select:focus {
 .sensei-listening-bar:nth-child(3) {
   animation-delay: 0.18s;
 }
+
+/* ═══════════════════════════════════════
+   VOICE ORB — PREMIUM FLOATING ORB
+   ═══════════════════════════════════════ */
+
+/* IDLE — slow soft pulse */
+@keyframes idlePulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 0 rgba(99,102,241,0.5),
+      0 0 20px rgba(99,102,241,0.2);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 0 12px rgba(99,102,241,0),
+      0 0 30px rgba(99,102,241,0.3);
+    transform: scale(1.04);
+  }
+}
+
+/* LISTENING — fast urgent pulse */
+@keyframes listeningPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 0 rgba(59,130,246,0.7),
+      0 0 25px rgba(59,130,246,0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 0 16px rgba(59,130,246,0),
+      0 0 40px rgba(59,130,246,0.5);
+    transform: scale(1.08);
+  }
+}
+
+/* SPEAKING — ripple ring 1 */
+@keyframes ripple1 {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* SPEAKING — ripple ring 2 (delayed) */
+@keyframes ripple2 {
+  0% { transform: scale(1); opacity: 0.4; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
+/* SPEAKING — ripple ring 3 (more delayed) */
+@keyframes ripple3 {
+  0% { transform: scale(1); opacity: 0.2; }
+  100% { transform: scale(3.4); opacity: 0; }
+}
+
+/* SPEAKING — orb breathe */
+@keyframes orbBreathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* FLOATING — subtle up/down */
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+/* BAR DANCE — listening animated bars */
+@keyframes barDance {
+  0%, 100% { height: 6px; }
+  50% { height: 18px; }
+}
+
+/* BLINK DOT */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.orb-main {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+}
+
+.orb-main:active {
+  transform: scale(0.94) !important;
+}
+
+.orb-idle {
+  background: linear-gradient(135deg, #6366F1, #8B5CF6);
+  animation: idlePulse 2.5s ease infinite, orbFloat 4s ease infinite;
+  box-shadow:
+    0 8px 32px rgba(99,102,241,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.orb-idle:hover {
+  transform: scale(1.1) translateY(-3px);
+  box-shadow:
+    0 12px 40px rgba(99,102,241,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.orb-listening {
+  background: linear-gradient(135deg, #3B82F6, #06B6D4);
+  animation: listeningPulse 0.8s ease infinite;
+  box-shadow:
+    0 8px 32px rgba(59,130,246,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.orb-speaking {
+  background: linear-gradient(135deg, #10B981, #059669);
+  animation: orbBreathe 1s ease infinite;
+  box-shadow:
+    0 8px 40px rgba(16,185,129,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.ripple-ring-1,
+.ripple-ring-2,
+.ripple-ring-3 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.ripple-ring-1 {
+  border: 2px solid rgba(16,185,129,0.5);
+  animation: ripple1 1.2s ease-out infinite;
+}
+
+.ripple-ring-2 {
+  border: 2px solid rgba(16,185,129,0.35);
+  animation: ripple2 1.2s ease-out infinite;
+  animation-delay: 0.4s;
+}
+
+.ripple-ring-3 {
+  border: 2px solid rgba(16,185,129,0.2);
+  animation: ripple3 1.2s ease-out infinite;
+  animation-delay: 0.8s;
+}
+
+.bar {
+  width: 3px;
+  border-radius: 2px;
+  background: white;
+}
+
+.bar-1 {
+  animation: barDance 0.5s ease infinite;
+}
+
+.bar-2 {
+  animation: barDance 0.5s ease infinite;
+  animation-delay: 0.15s;
+}
+
+.bar-3 {
+  animation: barDance 0.5s ease infinite;
+  animation-delay: 0.3s;
+}
+
+.orb-label {
+  position: absolute;
+  bottom: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.orb-label-idle {
+  color: #4B5563;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid #1C2333;
+}
+
+.orb-label-listening {
+  color: #3B82F6;
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.2);
+}
+
+.orb-label-speaking {
+  color: #10B981;
+  background: rgba(16,185,129,0.1);
+  border: 1px solid rgba(16,185,129,0.2);
+}
+
+.blink-dot {
+  width: 6px;
+  height: 6px;
+  background: #3B82F6;
+  border-radius: 50%;
+  animation: blink 1s ease infinite;
+  flex-shrink: 0;
+}

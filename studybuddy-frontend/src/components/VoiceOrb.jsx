@@ -401,45 +401,99 @@ export default function VoiceOrb({ studentId, onResult, speakText, onScheduleCre
 
   const isListeningState = isRecording || isProcessing
 
-  const orbStateClass = isSpeaking
-    ? 'sensei-orb--speaking'
+  const orbState = isSpeaking
+    ? 'speaking'
     : isListeningState
-      ? 'sensei-orb--listening'
-      : 'sensei-orb--idle'
+      ? 'listening'
+      : 'idle'
 
-  const statusText = isSpeaking
-    ? 'Sensei is speaking...'
-    : isListeningState
-      ? 'Listening...'
-      : 'Ask Sensei'
+  const handleOrbClick = toggleRecording
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 pointer-events-none flex flex-col items-center">
-      <button
-        type="button"
-        onClick={toggleRecording}
-        title={statusText}
-        className={`sensei-orb ${orbStateClass} pointer-events-auto`}
-      >
-        {isSpeaking ? (
-          <SpeakerIcon className="h-7 w-7 text-white" />
-        ) : isListeningState ? (
-          <span className="sensei-listening-bars" aria-hidden="true">
-            <span className="sensei-listening-bar" />
-            <span className="sensei-listening-bar" />
-            <span className="sensei-listening-bar" />
-          </span>
-        ) : (
-          <MicIcon className="h-7 w-7 text-white" />
-        )}
-      </button>
+    <div style={{
+      position: 'fixed',
+      bottom: '28px',
+      right: '28px',
+      zIndex: 9999,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    }}>
 
-      <p className={`mt-2 text-xs pointer-events-none ${isSpeaking ? 'text-[#10B981]' : isListeningState ? 'text-[#3B82F6]' : 'text-[#4B5563]'}`}>
-        {statusText}
-      </p>
+      {/* Orb wrapper */}
+      <div style={{
+        position: 'relative',
+        width: '60px',
+        height: '60px',
+      }}>
+
+        {/* Ripple rings — speaking only */}
+        {orbState === 'speaking' && (
+          <>
+            <div className="ripple-ring-1" />
+            <div className="ripple-ring-2" />
+            <div className="ripple-ring-3" />
+          </>
+        )}
+
+        {/* Main orb */}
+        <div
+          onClick={handleOrbClick}
+          className={`orb-main orb-${orbState}`}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Enter' && handleOrbClick()}
+        >
+          {/* Icon */}
+          {orbState === 'idle' && (
+            <span style={{ fontSize: '22px', lineHeight: 1, userSelect: 'none', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>
+              🎙️
+            </span>
+          )}
+
+          {orbState === 'listening' && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '3px',
+              height: '20px',
+            }}>
+              <div className="bar bar-1" />
+              <div className="bar bar-2" />
+              <div className="bar bar-3" />
+            </div>
+          )}
+
+          {orbState === 'speaking' && (
+            <span style={{ fontSize: '22px', lineHeight: 1, userSelect: 'none', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>
+              🔊
+            </span>
+          )}
+        </div>
+
+        {/* Label */}
+        <div className={`orb-label orb-label-${orbState}`}>
+          {orbState === 'idle' && 'Ask Sensei'}
+          {orbState === 'listening' && (
+            <>
+              <span className="blink-dot" />
+              Listening...
+            </>
+          )}
+          {orbState === 'speaking' && 'Sensei is speaking...'}
+        </div>
+
+      </div>
 
       {voiceError && (
-        <p className="mt-1 max-w-[220px] text-center text-[11px] text-rose-300 pointer-events-none">{voiceError}</p>
+        <p style={{
+          marginTop: '32px',
+          maxWidth: '220px',
+          textAlign: 'center',
+          fontSize: '11px',
+          color: '#fca5a5',
+          pointerEvents: 'none',
+        }}>{voiceError}</p>
       )}
     </div>
   )
