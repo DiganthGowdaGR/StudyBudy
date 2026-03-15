@@ -11,11 +11,16 @@
   ],
   "routes": [
     {
+      "src": "/(.*)",
+      "dest": "/studybuddy-frontend/$1",
+      "continue": true
+    },
+    {
       "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/studybuddy-frontend/index.html"
     }
   ]
 }
