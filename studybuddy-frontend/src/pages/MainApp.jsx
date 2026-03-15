@@ -13,11 +13,12 @@ import { getEmotionResponse } from '../utils/emotionReactions'
 import { api } from '../services/api'
 
 const TAB_ITEMS = [
-  { id: 'home', label: 'Home' },
-  { id: 'organizations', label: 'My Classes' },
-  { id: 'library', label: 'Library' },
-  { id: 'flashcards', label: 'Flashcards' },
-  { id: 'schedule', label: 'Schedule' },
+  { id: 'home', label: 'Home', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1' },
+  { id: 'organizations', label: 'My Classes', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+  { id: 'workspace', label: 'Workspace', icon: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' },
+  { id: 'library', label: 'Library', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
+  { id: 'flashcards', label: 'Flashcards', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01m-.01 4h.01' },
+  { id: 'schedule', label: 'Schedule', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
 ]
 
 function todayKey() {
@@ -781,177 +782,183 @@ export default function MainApp() {
     navigate('/')
   }
 
+  const handleScheduleCreatedFromVoice = (event) => {
+    if (!event) return
+    const mapped = mapScheduleEventFromApi(event)
+    setCustomEvents((prev) => [...prev, mapped].sort(sortScheduleEvents))
+  }
+
   return (
-    <div className="h-screen w-full bg-[#0a0a0f] md:overflow-hidden overflow-y-auto">
-      <header className="fixed top-0 left-0 right-0 h-14 bg-[#111118] border-b border-[#1e1e2e] flex items-center justify-between px-6 z-40">
-        <div className="flex items-center gap-6 min-w-0">
-          <div className="flex items-center gap-2 shrink-0">
+    <div className="flex h-screen bg-[#090b14] text-white overflow-hidden">
+      {/* SIDEBAR */}
+      <aside className="w-56 flex-shrink-0 border-r border-[#1e1e2e] bg-[#0d0f1a] flex flex-col">
+        <div className="p-4 border-b border-[#1e1e2e]">
+          <div className="flex items-center gap-2">
             <span className="h-6 w-6 rounded-md bg-indigo-600 border border-indigo-500 grid place-items-center">
               <span className="h-2 w-2 rounded-sm bg-white" />
             </span>
             <p className="text-white font-semibold">StudyBuddy</p>
           </div>
-
-          <nav className="hidden md:flex items-center gap-1 bg-[#171827] border border-[#2c2d42] rounded-xl p-1">
-            {TAB_ITEMS.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
+          <p className="text-[10px] uppercase tracking-[0.22em] text-indigo-400 mt-2">Student Portal</p>
+          <p className="text-sm text-white font-semibold mt-0.5 truncate">{studentName}</p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
+          {TAB_ITEMS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`w-full flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
+                activeTab === tab.id
+                  ? 'bg-indigo-600/20 text-indigo-300'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d={tab.icon} />
+              </svg>
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="p-3 border-t border-[#1e1e2e] space-y-2">
           {isWorkspaceTab && (
             <button
               type="button"
               onClick={handleToggleFaceDetection}
-              className={faceDetectionOn
-                ? 'group inline-flex items-center gap-2 rounded-full border border-indigo-300/60 bg-gradient-to-r from-indigo-600/80 to-blue-600/75 px-3 py-1.5 text-xs text-white shadow-[0_6px_18px_rgba(80,85,230,0.35)] transition-all hover:from-indigo-500 hover:to-blue-500'
-                : 'group inline-flex items-center gap-2 rounded-full border border-[#2d3659] bg-[#131a2c] px-3 py-1.5 text-xs text-slate-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all hover:border-indigo-400/50 hover:bg-[#17213a]'}
               title={currentEmotion ? `Current emotion: ${currentEmotion}` : 'Focus Mode'}
               data-last-reacted-emotion={lastReactedEmotion || ''}
+              className={`w-full flex items-center gap-2 rounded-lg px-3 py-2 text-xs transition-colors ${
+                faceDetectionOn
+                  ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
+              }`}
             >
-              <span className={faceDetectionOn
-                ? 'grid h-5 w-5 place-items-center rounded-full border border-white/25 bg-white/20'
-                : 'grid h-5 w-5 place-items-center rounded-full border border-slate-500/40 bg-slate-800/70'}
-              >
-                <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5" aria-hidden="true">
-                  <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h8A2.5 2.5 0 0 1 17 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-8A2.5 2.5 0 0 1 4 16.5v-9Z" stroke="currentColor" strokeWidth="1.8" />
-                  <path d="m17 9 3-1.7v9.4L17 15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
-
-              <span className="leading-none text-left">
-                <span className="block font-medium">Focus Mode</span>
-                <span className={faceDetectionOn ? 'block text-[10px] text-indigo-100/90' : 'block text-[10px] text-slate-400'}>
-                  {faceDetectionOn ? 'Camera active' : 'Enable camera'}
-                </span>
-              </span>
-
-              <span className={faceDetectionOn ? 'h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_8px_rgba(110,231,183,0.95)]' : 'h-2 w-2 rounded-full bg-slate-500'} />
+              <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 flex-shrink-0" aria-hidden="true">
+                <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h8A2.5 2.5 0 0 1 17 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-8A2.5 2.5 0 0 1 4 16.5v-9Z" stroke="currentColor" strokeWidth="1.5" />
+                <path d="m17 9 3-1.7v9.4L17 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="flex-1 text-left">Focus Mode</span>
+              <span className={faceDetectionOn ? 'h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_8px_rgba(110,231,183,0.95)]' : 'h-2 w-2 rounded-full bg-slate-600'} />
             </button>
           )}
-
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="w-full rounded-lg border border-[#343b5a] bg-[#161b32] px-3 py-2 text-xs text-slate-300 hover:border-indigo-400 transition-colors"
+          >
+            Portal Selection
+          </button>
           <button
             type="button"
             onClick={handleLogout}
-            className="text-xs text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 rounded-lg px-3 py-1 transition-all"
+            className="w-full rounded-lg bg-rose-600/80 px-3 py-2 text-xs text-white hover:bg-rose-500 transition-colors"
           >
             Logout
           </button>
+        </div>
+      </aside>
 
-          <div className="rounded-full bg-[#161726] border border-[#2c2d42] px-3 py-1 text-sm text-gray-300">
-            {studentName}
+      {/* MAIN */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {faceDetectionError && (
+          <div className="absolute top-3 right-4 z-40 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-1.5 text-xs text-rose-200">
+            {faceDetectionError}
           </div>
+        )}
+
+        <div className="flex-1 overflow-hidden">
+          {activeTab === 'home' && (
+            <HomeView
+              studentName={student.name}
+              sessions={sessions}
+              customEvents={customEvents}
+              documents={documents}
+              reviewStats={reviewStats}
+              workspaces={workspaces}
+              activeWorkspaceId={activeWorkspace?.id}
+              onOpenWorkspace={handleOpenWorkspace}
+              onCreateWorkspace={handleCreateWorkspace}
+              onDeleteWorkspace={handleDeleteWorkspace}
+            />
+          )}
+
+          {activeTab === 'organizations' && (
+            <OrganizationsView
+              studentName={studentName}
+            />
+          )}
+
+          {activeTab === 'workspace' && (
+            <WorkspaceView
+              workspaceName={activeWorkspace?.name}
+              activeTitle={activeTitle}
+              activeNotes={activeNotes}
+              onChat={handleChat}
+              chatMessages={chatMessages}
+              greeting={greeting}
+              documents={workspaceDocuments}
+              onGenerate={handleGenerate}
+              onSearchNotes={handleSearchNotes}
+              onUpload={handleUpload}
+              onDeleteDocument={handleDeleteDocument}
+              talkHistory={talkHistory}
+              onDeleteTalk={handleDeleteTalk}
+              onClearTalks={handleClearTalks}
+            />
+          )}
+
+          {activeTab === 'library' && (
+            <LibraryView
+              documents={documents}
+              onUpload={handleUpload}
+              onGenerate={handleGenerate}
+              onOpenWorkspace={() => setActiveTab('workspace')}
+              onDeleteDocument={handleDeleteDocument}
+            />
+          )}
+
+          {activeTab === 'flashcards' && (
+            <FlashcardsView
+              flashcards={flashcards}
+              reviewStats={reviewStats}
+              onCreateCard={handleCreateFlashcard}
+              onGenerateAnswer={handleGenerateFlashcardAnswer}
+              onToggleMastered={handleToggleMastered}
+              onMarkReviewed={handleMarkReviewed}
+              onDeleteCard={handleDeleteFlashcard}
+            />
+          )}
+
+          {activeTab === 'schedule' && (
+            <ScheduleView
+              sessions={sessions}
+              customEvents={customEvents}
+              onCreateEvent={handleCreateScheduleEvent}
+              onDeleteEvent={handleDeleteScheduleEvent}
+            />
+          )}
         </div>
-      </header>
 
-      {faceDetectionError && (
-        <div className="fixed top-16 right-6 z-40 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-1.5 text-xs text-rose-200">
-          {faceDetectionError}
-        </div>
-      )}
-
-      <div className="pt-14 h-[calc(100vh-56px)]">
-        {activeTab === 'home' && (
-          <HomeView
-            studentName={student.name}
-            sessions={sessions}
-            customEvents={customEvents}
-            documents={documents}
-            reviewStats={reviewStats}
-            workspaces={workspaces}
-            activeWorkspaceId={activeWorkspace?.id}
-            onOpenWorkspace={handleOpenWorkspace}
-            onCreateWorkspace={handleCreateWorkspace}
-            onDeleteWorkspace={handleDeleteWorkspace}
+        {isWorkspaceTab && faceDetectionOn && (
+          <FaceDetectionPip
+            videoRef={previewVideoRef}
+            currentEmotion={currentEmotion}
+            onClose={handleStopFaceDetection}
           />
         )}
 
-        {activeTab === 'organizations' && (
-          <OrganizationsView
-            studentName={studentName}
-          />
-        )}
+        <video ref={captureVideoRef} className="hidden" muted />
 
-        {activeTab === 'workspace' && (
-          <WorkspaceView
-            workspaceName={activeWorkspace?.name}
-            activeTitle={activeTitle}
-            activeNotes={activeNotes}
-            onChat={handleChat}
-            chatMessages={chatMessages}
-            greeting={greeting}
-            documents={workspaceDocuments}
-            onGenerate={handleGenerate}
-            onSearchNotes={handleSearchNotes}
-            onUpload={handleUpload}
-            onDeleteDocument={handleDeleteDocument}
-            talkHistory={talkHistory}
-            onDeleteTalk={handleDeleteTalk}
-            onClearTalks={handleClearTalks}
-          />
-        )}
-
-        {activeTab === 'library' && (
-          <LibraryView
-            documents={documents}
-            onUpload={handleUpload}
-            onGenerate={handleGenerate}
-            onOpenWorkspace={() => setActiveTab('workspace')}
-            onDeleteDocument={handleDeleteDocument}
-          />
-        )}
-
-        {activeTab === 'flashcards' && (
-          <FlashcardsView
-            flashcards={flashcards}
-            reviewStats={reviewStats}
-            onCreateCard={handleCreateFlashcard}
-            onGenerateAnswer={handleGenerateFlashcardAnswer}
-            onToggleMastered={handleToggleMastered}
-            onMarkReviewed={handleMarkReviewed}
-            onDeleteCard={handleDeleteFlashcard}
-          />
-        )}
-
-        {activeTab === 'schedule' && (
-          <ScheduleView
-            sessions={sessions}
-            customEvents={customEvents}
-            onCreateEvent={handleCreateScheduleEvent}
-            onDeleteEvent={handleDeleteScheduleEvent}
-          />
-        )}
-      </div>
-
-      {isWorkspaceTab && faceDetectionOn && (
-        <FaceDetectionPip
-          videoRef={previewVideoRef}
-          currentEmotion={currentEmotion}
-          onClose={handleStopFaceDetection}
-        />
-      )}
-
-      <video ref={captureVideoRef} className="hidden" muted />
-
-      {isWorkspaceTab && (
         <VoiceOrb
           studentId={student.id}
           onResult={handleVoiceResult}
           speakText={speakText}
+          onScheduleCreated={handleScheduleCreatedFromVoice}
         />
-      )}
+      </div>
     </div>
   )
 }
