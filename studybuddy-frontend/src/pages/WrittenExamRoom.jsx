@@ -27,6 +27,10 @@ export default function WrittenExamRoom() {
   const [timeLeft, setTimeLeft] = useState(0)
   const timerRef = useRef(null)
 
+  useEffect(() => {
+    document.title = 'StudyBuddy — Exam in Progress'
+  }, [])
+
   /* ── Load exam ── */
   useEffect(() => {
     if (!studentId) { navigate('/'); return }

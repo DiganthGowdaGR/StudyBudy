@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 function StudentIcon() {
@@ -33,18 +33,18 @@ function OrganizationIcon() {
   )
 }
 
-function PortalCard({ title, description, buttonLabel, onClick, icon, accentClass }) {
+function PortalCard({ title, description, buttonLabel, onClick, icon, accentClass, hoverGlow }) {
   return (
-    <article className="rounded-2xl border border-[#2a3048] bg-[#101424] p-6 shadow-[0_20px_45px_rgba(0,0,0,0.3)]">
-      <div className={`mx-auto mb-5 h-24 w-24 rounded-full ${accentClass} grid place-items-center`}>
+    <article className={`group relative flex w-[320px] flex-col rounded-2xl border border-[#1C2333] bg-[#0D1117] p-8 shadow-[0_24px_60px_rgba(0,0,0,0.45)] transition-all duration-200 hover:-translate-y-1 ${hoverGlow}`}>
+      <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border ${accentClass}`}> 
         {icon}
       </div>
-      <h3 className="text-center text-4xl font-semibold text-white">{title}</h3>
-      <p className="mt-3 text-center text-[20px] leading-8 text-slate-300">{description}</p>
+      <h3 className="mt-6 text-center text-2xl font-bold text-white">{title}</h3>
+      <p className="mt-3 text-center text-sm leading-6 text-[#94A3B8]">{description}</p>
       <button
         type="button"
         onClick={onClick}
-        className="mt-8 w-full rounded-xl bg-indigo-600 py-3 text-[20px] font-medium text-white hover:bg-indigo-500"
+        className="mt-8 w-full rounded-xl bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] py-3 text-sm font-semibold text-white shadow-[0_0_20px_rgba(99,102,241,0.18)] transition-all duration-200 hover:shadow-[0_0_30px_rgba(99,102,241,0.25)] hover:-translate-y-0.5"
       >
         {buttonLabel}
       </button>
@@ -55,48 +55,84 @@ function PortalCard({ title, description, buttonLabel, onClick, icon, accentClas
 export default function PortalSelect() {
   const navigate = useNavigate()
 
+  useEffect(() => {
+    document.title = 'StudyBuddy — Login'
+  }, [])
+
   return (
-    <div className="portal-scene relative min-h-screen overflow-hidden bg-[#060915] px-4 py-6 md:px-6 md:py-8">
-      <div className="portal-motion-bg" />
-      <div className="portal-motion-orb portal-motion-orb--a" />
-      <div className="portal-motion-orb portal-motion-orb--b" />
-      <div className="portal-motion-orb portal-motion-orb--c" />
-      <div className="portal-motion-grid" />
+    <div className="portal-scene relative min-h-screen overflow-hidden bg-[#080B14] px-6 py-10">
+      <div className="portal-blob" />
+      <div className="portal-grid" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(99,102,241,0.12),transparent_50%),radial-gradient(circle_at_80%_10%,rgba(16,185,129,0.08),transparent_45%)]" />
 
-      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-3rem)] max-w-[1400px] items-center justify-center">
-        <div className="w-full rounded-3xl border border-[#2a3150] bg-[radial-gradient(circle_at_top,#1a2448_0%,#111a34_55%,#0b1124_100%)] px-4 py-6 shadow-[0_30px_80px_rgba(0,0,0,0.45)] md:px-8 md:py-10">
-          <p className="text-xs text-slate-500">Generated Screen</p>
-          <h1 className="mt-3 text-center text-5xl font-semibold text-white md:text-6xl">Welcome Back</h1>
-          <p className="mt-4 text-center text-2xl text-slate-300 md:text-[34px]">Please select your portal to continue</p>
+      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-5rem)] max-w-6xl flex-col items-center justify-center text-center space-y-10">
+        <div className="space-y-3">
+          <div className="mx-auto flex items-center justify-center gap-3">
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] shadow-[0_0_20px_rgba(99,102,241,0.2)]">
+              <span className="h-5 w-5 rounded-lg bg-white/90" />
+            </span>
+            <div className="text-left">
+              <p className="text-xl font-bold text-white">StudyBuddy</p>
+              <p className="text-sm text-[#4B5563]">Your AI-powered study companion</p>
+            </div>
+          </div>
 
-          <div className="mt-10 grid gap-5 lg:grid-cols-3">
+          <div className="space-y-2">
+            <h1 className="text-[38px] md:text-[52px] font-extrabold text-white leading-[1.1]">
+              Your AI tutor that{' '}
+              <span
+                style={{
+                  background: 'linear-gradient(135deg, #6366F1, #A78BFA)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                never sleeps
+              </span>
+              .
+            </h1>
+            <p className="text-[18px] text-[#4B5563] mt-4">Upload your notes. Ask anything. Get smarter every day.</p>
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
+              <div className="flex -space-x-2">
+                <span className="h-7 w-7 rounded-full border border-[#0b1020] bg-[#6366F1] text-[10px] font-semibold text-white grid place-items-center">RT</span>
+                <span className="h-7 w-7 rounded-full border border-[#0b1020] bg-[#10B981] text-[10px] font-semibold text-white grid place-items-center">AK</span>
+                <span className="h-7 w-7 rounded-full border border-[#0b1020] bg-[#F59E0B] text-[10px] font-semibold text-white grid place-items-center">SB</span>
+              </div>
+              <p className="text-[13px] text-[#374151]">Trusted by students at RIT and beyond</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-3">
           <PortalCard
             title="Student"
-            description="Access your courses, assignments, and grades."
+            description="Your personal AI tutor. Upload PDFs, ask questions by voice, take exams and track your progress daily."
             buttonLabel="Login as Student"
             onClick={() => navigate('/student/login')}
             icon={<StudentIcon />}
-            accentClass="bg-indigo-500/15"
+            accentClass="border-[#6366F1]/40 bg-[#6366F1]/10 text-[#6366F1]"
+            hoverGlow="hover:border-[#6366F1] hover:shadow-[0_0_40px_rgba(99,102,241,0.1)]"
           />
 
           <PortalCard
             title="Teacher"
-            description="Login using credentials provided by your organization."
+            description="Create exams, grade submissions, post announcements and watch your students grow."
             buttonLabel="Login as Teacher"
             onClick={() => navigate('/teacher/login')}
             icon={<TeacherIcon />}
-            accentClass="bg-emerald-500/15"
+            accentClass="border-[#8B5CF6]/40 bg-[#8B5CF6]/10 text-[#8B5CF6]"
+            hoverGlow="hover:border-[#8B5CF6] hover:shadow-[0_0_40px_rgba(139,92,246,0.1)]"
           />
 
           <PortalCard
             title="Organization"
-            description="Create organization account, manage teachers, and authorize students."
+            description="Set up your institution, register teachers, manage subjects and authorize students at scale."
             buttonLabel="Login as Organization"
             onClick={() => navigate('/organization/login')}
             icon={<OrganizationIcon />}
-            accentClass="bg-slate-400/15"
+            accentClass="border-[#10B981]/40 bg-[#10B981]/10 text-[#10B981]"
+            hoverGlow="hover:border-[#10B981] hover:shadow-[0_0_40px_rgba(16,185,129,0.1)]"
           />
-          </div>
         </div>
       </div>
     </div>

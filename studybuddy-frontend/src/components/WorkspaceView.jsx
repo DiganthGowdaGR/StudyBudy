@@ -237,9 +237,9 @@ export default function WorkspaceView({
   const workspaceLabel = workspaceName || 'General'
 
   return (
-    <div className="h-full flex">
+    <div className="h-full flex bg-[#070912] text-slate-200">
       <aside
-        className={`border-r border-[#212339] bg-[#0e1019] transition-all duration-300 ${
+        className={`border-r border-[#131933] bg-[#0a0d19] transition-all duration-300 shadow-[inset_-1px_0_0_rgba(99,102,241,0.08)] ${
           isSourcesCollapsed ? 'w-[76px]' : 'w-[19.5rem]'
         }`}
       >
@@ -253,11 +253,11 @@ export default function WorkspaceView({
         />
 
         {isSourcesCollapsed ? (
-          <div className="h-full flex flex-col items-center py-3 gap-3">
+          <div className="h-full flex flex-col items-center py-3 gap-3 bg-gradient-to-b from-[#0f1324] to-transparent">
             <button
               type="button"
               onClick={() => setIsSourcesCollapsed(false)}
-              className="h-11 w-11 rounded-xl border border-[#31344b] bg-[#171a29] text-gray-300 grid place-items-center"
+              className="h-11 w-11 rounded-xl border border-[#1f2744] bg-[#0f1426] text-gray-200 grid place-items-center hover:border-indigo-500"
               title="Expand Sources"
             >
               <PanelIcon className="h-4 w-4" />
@@ -276,28 +276,28 @@ export default function WorkspaceView({
               type="button"
               onClick={handleUpload}
               disabled={uploading || !selectedFile}
-              className="w-11 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-11 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] py-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_10px_30px_rgba(99,102,241,0.2)]"
               title="Push source"
             >
               {uploading ? '...' : 'Push'}
             </button>
 
-            <div className="mt-auto w-11 rounded-lg border border-[#2a2f45] bg-[#141826] px-1 py-2 text-center">
+            <div className="mt-auto w-11 rounded-lg border border-[#1c233d] bg-[#0f1426] px-1 py-2 text-center">
               <p className="text-[9px] text-gray-400 uppercase tracking-wider">Src</p>
               <p className="text-sm text-white font-semibold leading-tight">{documents.length}</p>
             </div>
           </div>
         ) : (
-          <div className="h-full p-4 flex flex-col gap-3 overflow-y-auto">
+          <div className="h-full p-4 flex flex-col gap-3 overflow-y-auto bg-gradient-to-b from-[#0d1325] via-[#0a0f1e] to-[#070912]">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-[32px] leading-none font-semibold text-gray-100">Sources</h3>
+                <h3 className="text-[28px] leading-none font-semibold text-white">Sources</h3>
                 <p className="text-[11px] uppercase tracking-[0.2em] text-indigo-300 mt-1">{workspaceLabel}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSourcesCollapsed(true)}
-                className="rounded-lg border border-[#31344b] bg-[#171a29] p-2 text-gray-300"
+                className="rounded-lg border border-[#1f2744] bg-[#0f1426] p-2 text-gray-200 hover:border-indigo-500"
                 title="Collapse Sources"
               >
                 <PanelIcon className="h-4 w-4" />
@@ -307,14 +307,14 @@ export default function WorkspaceView({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full rounded-full border border-[#323650] bg-[#171b2a] px-4 py-3 text-white text-[28px] leading-none flex items-center justify-center gap-3 hover:border-indigo-500 transition-all"
+              className="w-full rounded-2xl border border-[#1f2744] bg-gradient-to-r from-[#0f1426] via-[#0f172a] to-[#0e1429] px-4 py-3 text-white text-[26px] leading-none flex items-center justify-center gap-3 hover:border-indigo-500 transition-all shadow-[0_10px_40px_rgba(99,102,241,0.18)]"
             >
               <span className="text-xl">+</span>
               <span className="text-[20px] font-semibold">Add sources</span>
             </button>
 
-            <div className="rounded-2xl border border-[#2c3046] bg-[#141826] p-3">
-              <div className="rounded-xl border border-[#2f334a] bg-[#10131f] px-3 py-2 flex items-center gap-2">
+            <div className="rounded-2xl border border-[#182038] bg-[#0b0f1d] p-3 shadow-[0_16px_40px_rgba(0,0,0,0.35)]">
+              <div className="rounded-xl border border-[#1f2744] bg-[#0f1426] px-3 py-2 flex items-center gap-2">
                 <SearchIcon className="h-4 w-4 text-gray-500" />
                 <input
                   type="text"
@@ -330,7 +330,7 @@ export default function WorkspaceView({
                   type="button"
                   onClick={() => handleSearchTrigger('web')}
                   disabled={isSearching}
-                  className="rounded-full border border-[#31364f] bg-[#1a1f30] px-3 py-1.5 text-xs text-gray-200 hover:bg-indigo-600 hover:text-white transition-all disabled:opacity-50"
+                  className="rounded-full border border-[#1f2744] bg-[#11162a] px-3 py-1.5 text-xs text-gray-200 hover:bg-indigo-600 hover:text-white transition-all disabled:opacity-50"
                 >
                   {isSearching ? '...' : 'Web'}
                 </button>
@@ -338,13 +338,13 @@ export default function WorkspaceView({
                   type="button"
                   onClick={() => handleSearchTrigger('research')}
                   disabled={isSearching}
-                  className="rounded-full border border-[#31364f] bg-[#1a1f30] px-3 py-1.5 text-xs text-gray-200 hover:bg-indigo-600 hover:text-white transition-all disabled:opacity-50"
+                  className="rounded-full border border-[#1f2744] bg-[#11162a] px-3 py-1.5 text-xs text-gray-200 hover:bg-indigo-600 hover:text-white transition-all disabled:opacity-50"
                 >
                   {isSearching ? '...' : 'Fast Research'}
                 </button>
                 <button
                   type="button"
-                  className="ml-auto h-8 w-8 rounded-full border border-[#31364f] bg-[#1a1f30] text-gray-200"
+                  className="ml-auto h-8 w-8 rounded-full border border-[#1f2744] bg-[#11162a] text-gray-200"
                 >&gt;</button>
               </div>
             </div>
@@ -355,7 +355,7 @@ export default function WorkspaceView({
                 type="checkbox"
                 checked={allVisibleSelected}
                 onChange={toggleSelectAllVisible}
-                className="h-4 w-4 rounded border-[#3a3f5a] bg-[#151a2a] text-indigo-500 focus:ring-indigo-500"
+                className="h-4 w-4 rounded border-[#2b3352] bg-[#0f1426] text-indigo-500 focus:ring-indigo-500"
               />
             </div>
 
@@ -366,10 +366,10 @@ export default function WorkspaceView({
                   return (
                     <div
                       key={doc.id}
-                      className={`rounded-xl border p-3 transition-all ${
+                      className={`rounded-xl border p-3 transition-all shadow-[0_12px_24px_rgba(0,0,0,0.35)] ${
                         selected
-                          ? 'bg-[#1b2033] border-indigo-500/70'
-                          : 'bg-[#121625] border-[#2a2f45]'
+                          ? 'bg-gradient-to-r from-[#11172c] via-[#141c34] to-[#11172c] border-indigo-500/70'
+                          : 'bg-[#0f1426] border-[#182038] hover:border-indigo-500/50'
                       }`}
                     >
                       <div className="flex items-start gap-2">
@@ -386,7 +386,7 @@ export default function WorkspaceView({
                           type="checkbox"
                           checked={selected}
                           onChange={() => toggleSourceSelection(doc.id)}
-                          className="mt-0.5 h-4 w-4 rounded border-[#3a3f5a] bg-[#151a2a] text-indigo-500 focus:ring-indigo-500"
+                          className="mt-0.5 h-4 w-4 rounded border-[#2b3352] bg-[#0f1426] text-indigo-500 focus:ring-indigo-500"
                         />
                       </div>
 
@@ -395,7 +395,7 @@ export default function WorkspaceView({
                           type="button"
                           onClick={() => handleGenerate(doc)}
                           disabled={activeGenerateDocId === doc.id}
-                          className="rounded-md bg-[#25283b] hover:bg-indigo-600 text-gray-200 text-[11px] px-2.5 py-1 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                          className="rounded-md bg-[#11162a] hover:bg-indigo-600 border border-[#1f2744] text-gray-200 text-[11px] px-2.5 py-1 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                           {activeGenerateDocId === doc.id ? '...' : 'Use'}
                         </button>
@@ -403,7 +403,7 @@ export default function WorkspaceView({
                           type="button"
                           onClick={() => handleDeleteDocument(doc)}
                           disabled={activeDeleteDocId === doc.id}
-                          className="rounded-md bg-[#3a1e2a] hover:bg-red-600 text-red-100 text-[11px] px-2.5 py-1 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                          className="rounded-md bg-[#2d1020] hover:bg-red-600 border border-[#4b1f31] text-red-100 text-[11px] px-2.5 py-1 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                           {activeDeleteDocId === doc.id ? '...' : 'Delete'}
                         </button>
@@ -412,13 +412,13 @@ export default function WorkspaceView({
                   )
                 })
               ) : (
-                <p className="rounded-xl border border-dashed border-[#2a2f45] bg-[#111423] px-3 py-5 text-center text-xs text-gray-500">
+                <p className="rounded-xl border border-dashed border-[#182038] bg-[#0c1020] px-3 py-5 text-center text-xs text-gray-500">
                   No sources found.
                 </p>
               )}
             </div>
 
-            <div className="mt-auto rounded-xl border border-[#2a2f45] bg-[#141826] p-3 space-y-1.5">
+            <div className="mt-auto rounded-xl border border-[#182038] bg-[#0c1020] p-3 space-y-1.5 shadow-[0_10px_40px_rgba(0,0,0,0.4)]">
               {selectedFile && <p className="text-xs text-gray-300 truncate">Selected: {selectedFile.name}</p>}
               {uploadError && <p className="text-red-400 text-xs">{uploadError}</p>}
               {uploadSuccess && <p className="text-green-400 text-xs">Uploaded: {uploadSuccess}</p>}
@@ -428,7 +428,7 @@ export default function WorkspaceView({
                 type="button"
                 onClick={handleUpload}
                 disabled={uploading || !selectedFile}
-                className="w-full rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm py-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_14px_40px_rgba(99,102,241,0.2)]"
               >
                 {uploading ? 'Uploading...' : 'Push Source'}
               </button>
@@ -437,20 +437,20 @@ export default function WorkspaceView({
         )}
       </aside>
 
-      <main className="relative flex-1 overflow-y-auto bg-[#0a0a0f] p-6 pb-44 md:pb-36 flex items-start justify-center">
-        <div className="absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none" />
+      <main className="relative flex-1 overflow-y-auto bg-gradient-to-br from-[#070912] via-[#080c18] to-[#0a0f1e] p-6 pb-44 md:pb-36 flex items-start justify-center">
+        <div className="absolute inset-0 bg-grid-pattern opacity-25 pointer-events-none" />
         <A4Sheet title={activeTitle} notes={activeNotes} />
       </main>
 
-      <aside className="w-80 bg-[#0f1018] border-l border-[#1e1e2e] flex flex-col">
-        <div className="h-14 border-b border-[#1e1e2e] px-4 flex items-center justify-between">
+      <aside className="w-80 bg-[#0c0f1a] border-l border-[#131933] flex flex-col shadow-[inset_1px_0_0_rgba(99,102,241,0.08)]">
+        <div className="h-14 border-b border-[#131933] px-4 flex items-center justify-between bg-[#0f1324]">
           <p className="text-sm font-semibold text-white">Sensei AI</p>
-          <span className="h-2 w-2 rounded-full bg-indigo-500" />
+          <span className="h-2 w-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.6)]" />
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-[#0f1324] via-[#0b0f1d] to-[#0a0c17]">
           {chatMessages.length === 0 ? (
-            <div className="rounded-xl border border-[#2c2d42] bg-[#171827] p-3">
+            <div className="rounded-xl border border-[#1f2744] bg-[#0f1426] p-3 shadow-[0_12px_24px_rgba(0,0,0,0.35)]">
               <p className="text-[10px] uppercase tracking-wider text-indigo-400">Sensei</p>
               <p className="text-sm text-gray-300 mt-1 leading-relaxed">{greeting || 'Ask a question and I will help you study this topic.'}</p>
             </div>
@@ -458,10 +458,10 @@ export default function WorkspaceView({
             chatMessages.map((message) => (
               <div
                 key={message.id}
-                className={`rounded-xl border p-3 ${
+                className={`rounded-xl border p-3 shadow-[0_10px_26px_rgba(0,0,0,0.35)] ${
                   message.role === 'student'
-                    ? 'bg-[#151726] border-[#2b2d42]'
-                    : 'bg-[#17152a] border-[#343056]'
+                    ? 'bg-[#0f1426] border-[#1f2744]'
+                    : 'bg-[#121733] border-[#1f2744]'
                 }`}
               >
                 <p className={`text-[10px] uppercase tracking-wider ${message.role === 'student' ? 'text-gray-400' : 'text-indigo-400'}`}>
@@ -472,18 +472,18 @@ export default function WorkspaceView({
             ))
           )}
 
-          <div className="rounded-xl border border-[#2c2d42] bg-[#141522] p-3">
+          <div className="rounded-xl border border-[#1f2744] bg-[#0f1426] p-3">
             <p className="text-[10px] uppercase tracking-wider text-gray-500">Context Files</p>
             <div className="mt-2 space-y-2">
               {contextDocuments.length > 0 ? (
                 contextDocuments.map((doc) => (
-                  <div key={doc.id} className="flex items-center justify-between gap-2">
+                    <div key={doc.id} className="flex items-center justify-between gap-2">
                     <p className="text-xs text-gray-300 truncate">{doc.filename}</p>
                     <button
                       type="button"
                       onClick={() => handleGenerate(doc)}
                       disabled={activeGenerateDocId === doc.id}
-                      className="text-[10px] rounded-md bg-[#25283b] hover:bg-indigo-600 text-gray-300 hover:text-white px-2 py-1 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="text-[10px] rounded-md bg-[#11162a] hover:bg-indigo-600 border border-[#1f2744] text-gray-300 hover:text-white px-2 py-1 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       {activeGenerateDocId === doc.id ? '...' : 'Notes'}
                     </button>
@@ -499,14 +499,14 @@ export default function WorkspaceView({
             {uploadSuccess && <p className="text-green-400 text-xs mt-1">Uploaded: {uploadSuccess}</p>}
           </div>
 
-          <div className="rounded-xl border border-[#2c2d42] bg-[#141522] p-3">
+          <div className="rounded-xl border border-[#1f2744] bg-[#0f1426] p-3">
             <div className="flex items-center justify-between gap-2">
               <p className="text-[10px] uppercase tracking-wider text-gray-500">Talk History</p>
               <button
                 type="button"
                 onClick={handleClearTalks}
                 disabled={clearingTalks || talkHistory.length === 0}
-                className="text-[10px] rounded-md bg-[#25283b] hover:bg-red-600 text-gray-300 hover:text-white px-2 py-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="text-[10px] rounded-md bg-[#11162a] hover:bg-red-600 border border-[#1f2744] text-gray-300 hover:text-white px-2 py-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {clearingTalks ? '...' : 'Clear'}
               </button>
@@ -515,7 +515,7 @@ export default function WorkspaceView({
             <div className="mt-2 space-y-2 max-h-44 overflow-y-auto pr-1">
               {talkHistory.length > 0 ? (
                 talkHistory.slice(0, 12).map((talk) => (
-                  <div key={talk.id} className="rounded-lg border border-[#2a2d42] bg-[#171a2a] px-2.5 py-2">
+                  <div key={talk.id} className="rounded-lg border border-[#1f2744] bg-[#0f1426] px-2.5 py-2">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <p className="text-[10px] uppercase tracking-wider text-indigo-300">
@@ -529,7 +529,7 @@ export default function WorkspaceView({
                         type="button"
                         onClick={() => handleDeleteTalk(talk.id)}
                         disabled={activeDeleteTalkId === talk.id}
-                        className="text-[10px] rounded-md bg-[#3a1e2a] hover:bg-red-600 text-red-100 px-2 py-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="text-[10px] rounded-md bg-[#2d1020] hover:bg-red-600 border border-[#4b1f31] text-red-100 px-2 py-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {activeDeleteTalkId === talk.id ? '...' : 'Del'}
                       </button>
@@ -545,19 +545,19 @@ export default function WorkspaceView({
           </div>
         </div>
 
-        <div className="border-t border-[#1e1e2e] p-4">
+        <div className="border-t border-[#131933] p-4 bg-[#0f1324]">
           <form onSubmit={handleSideChat} className="flex gap-2">
             <input
               type="text"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Ask Sensei anything..."
-              className="flex-1 bg-[#171827] border border-[#2c2d42] rounded-xl px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="flex-1 bg-[#0f1426] border border-[#1f2744] rounded-xl px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-[0_12px_24px_rgba(0,0,0,0.35)]"
             />
             <button
               type="submit"
               disabled={sendingQuestion}
-              className="rounded-xl px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm min-w-20 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="rounded-xl px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm min-w-20 disabled:opacity-70 disabled:cursor-not-allowed shadow-[0_14px_32px_rgba(99,102,241,0.25)]"
             >
               {sendingQuestion ? (
                 <span className="inline-flex items-center justify-center gap-2">
