@@ -38,3 +38,28 @@ async def create_session(body: SessionRequest):
         return {"session_id": row["id"], "status": "success"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/memory/heatmap/{student_id}")
+async def get_heatmap(student_id: str):
+    """Return study minutes grouped per date for heatmap visualization."""
+    try:
+        res = (
+            supabase_service.supabase
+            .table("sessions")
+            .select("created_at, duration_mins")
+            .eq("student_id", student_id)
+            .execute()
+        )
+
+        heatmap: dict[str, int] = {}
+        for session in res.data or []:
+            date = (session.get("created_at") or "")[:10]
+            mins = session.get("duration_mins", 0) or 0
+            if not date:
+                continue
+            heatmap[date] = heatmap.get(date, 0) + int(mins)
+
+        return {"heatmap": heatmap, "status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
