@@ -71,6 +71,10 @@ export default function OrgView() {
   const [activeTab, setActiveTab] = useState('announcements')
   const [error, setError] = useState('')
 
+  useEffect(() => {
+    document.title = 'StudyBuddy — My Classes'
+  }, [])
+
   const loadContext = useCallback(async () => {
     if (!studentId || !subjectId) return
 
@@ -122,7 +126,9 @@ export default function OrgView() {
     setLoadingExams(true)
     try {
       const res = await api.getAvailableExams(studentId)
-      const all = Array.isArray(res?.exams) ? res.exams : []
+      const all = Array.isArray(res?.available)
+        ? res.available
+        : (Array.isArray(res?.exams) ? res.exams : [])
       setExams(all.filter((e) => String(e.subject_id) === String(currentSubjectId)))
     } catch {
       setExams([])
@@ -175,21 +181,21 @@ export default function OrgView() {
 
   if (loadingContext) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-700 border-t-indigo-500" />
+      <div className="min-h-screen bg-[#080B14] text-white flex items-center justify-center">
+        <div className="sb-spinner" />
       </div>
     )
   }
 
   if (!subjectRow) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white p-6">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-[#2a2d44] bg-[#101426] p-6 text-center">
-          <p className="text-sm text-slate-300">{error || 'Class not found.'}</p>
+      <div className="min-h-screen bg-[#080B14] text-white p-6">
+        <div className="mx-auto max-w-3xl sb-card text-center">
+          <p className="text-sm text-[#94A3B8]">{error || 'Class not found.'}</p>
           <button
             type="button"
             onClick={() => navigate('/app/organizations')}
-            className="mt-4 rounded-lg bg-indigo-600 px-3 py-2 text-xs text-white hover:bg-indigo-500"
+            className="mt-4 sb-btn-primary text-xs px-4 py-2"
           >
             Back to Classes
           </button>
@@ -201,70 +207,63 @@ export default function OrgView() {
   const isApproved = subjectRow.status === 'approved'
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <header className="sticky top-0 z-20 h-14 border-b border-[#1e1e2e] bg-[#111118] px-4 md:px-6">
+    <div className="min-h-screen bg-[#080B14] text-white">
+      <header className="sticky top-0 z-20 h-14 bg-[rgba(8,11,20,0.9)] backdrop-blur-xl border-b border-[#1C2333] px-4 md:px-6 shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
         <div className="mx-auto flex h-full max-w-7xl items-center justify-between">
           <button
             type="button"
             onClick={() => navigate('/app/organizations')}
-            className="rounded-lg bg-gray-800 px-3 py-1 text-xs text-gray-400 transition-all hover:bg-gray-700 hover:text-white"
+            className="sb-btn-secondary text-xs px-3 py-2"
           >
             Back to Classes
           </button>
 
-          <p className="text-sm font-semibold text-white">{subjectRow.organization.name}</p>
+          <p className="text-sm font-semibold text-white truncate px-2">{subjectRow.organization.name}</p>
 
-          <div className="rounded-full border border-[#2c2d42] bg-[#161726] px-3 py-1 text-sm text-gray-300">
+          <div className="rounded-full bg-[#0F172A] border border-[#1E293B] px-3 py-1 text-sm text-[#E5E7EB]">
             {studentName}
           </div>
         </div>
       </header>
 
-      <section className="border-b border-gray-800 bg-gray-900 p-4">
+      <section className="border-b border-[#1C2333] bg-[rgba(15,19,36,0.85)] p-4">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-semibold text-white">{subjectRow.subject.name}</h2>
-              <p className="text-sm text-indigo-300 mt-0.5">{subjectRow.subject.subject_code}</p>
-              <p className="text-xs text-gray-400 mt-1">Teacher: {subjectRow.teacher.full_name}</p>
+              <h2 className="text-2xl font-bold text-white">{subjectRow.subject.name}</h2>
+              <p className="text-sm text-[#6366F1] mt-0.5">{subjectRow.subject.subject_code}</p>
+              <p className="text-xs text-[#4B5563] mt-1">Teacher: {subjectRow.teacher.full_name}</p>
             </div>
             <div>
-              <span className={`rounded-full px-2 py-1 text-xs ${subjectRow.status === 'approved' ? 'bg-emerald-900/30 text-emerald-300' : subjectRow.status === 'rejected' ? 'bg-rose-900/25 text-rose-300' : 'bg-amber-900/25 text-amber-300'}`}>
+              <span className={`sb-badge ${subjectRow.status === 'approved' ? 'success' : subjectRow.status === 'rejected' ? 'danger' : 'warning'}`}>
                 {subjectRow.status}
               </span>
             </div>
           </div>
 
-          <div className="mt-4 flex items-center gap-4 border-b border-gray-800/70">
-            <button
-              type="button"
-              onClick={() => setActiveTab('announcements')}
-              className={`pb-2 text-sm ${activeTab === 'announcements' ? 'border-b-2 border-indigo-500 text-white' : 'text-gray-500 hover:text-gray-300'}`}
-            >
-              Announcements
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('exams')}
-              className={`pb-2 text-sm ${activeTab === 'exams' ? 'border-b-2 border-indigo-500 text-white' : 'text-gray-500 hover:text-gray-300'}`}
-            >
-              Exams
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('leaderboard')}
-              className={`pb-2 text-sm ${activeTab === 'leaderboard' ? 'border-b-2 border-indigo-500 text-white' : 'text-gray-500 hover:text-gray-300'}`}
-            >
-              Leaderboard
-            </button>
+          <div className="mt-4 flex items-center gap-2">
+            {['announcements', 'exams', 'leaderboard'].map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
+                  activeTab === tab
+                    ? 'border-[rgba(99,102,241,0.35)] bg-[rgba(99,102,241,0.14)] text-white shadow-[0_0_18px_rgba(99,102,241,0.2)]'
+                    : 'border-transparent text-[#94A3B8] hover:text-white hover:bg-[rgba(148,163,184,0.08)]'
+                }`}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
           </div>
         </div>
       </section>
 
       <div className="mx-auto max-w-7xl p-4 md:p-6">
         {!isApproved ? (
-          <div className="rounded-xl border border-[#2a2d44] bg-[#101426] p-6 text-center">
-            <p className="text-sm text-slate-300">
+          <div className="sb-card text-center">
+            <p className="text-sm text-[#94A3B8]">
               Access to class content is available after your enrollment request is approved.
             </p>
           </div>
@@ -274,24 +273,26 @@ export default function OrgView() {
               <div>
                 {loadingAnnouncements ? (
                   <div className="py-8 flex justify-center">
-                    <div className="h-7 w-7 animate-spin rounded-full border-2 border-gray-700 border-t-indigo-500" />
+                    <div className="sb-spinner" />
                   </div>
                 ) : announcements.length === 0 ? (
-                  <p className="py-8 text-center text-gray-500">No announcements yet.</p>
+                  <div className="py-8 text-center">
+                    <p className="text-4xl" aria-hidden="true">📢</p>
+                    <p className="mt-3 text-lg font-semibold text-white">All quiet here</p>
+                    <p className="mt-2 text-sm text-[#4B5563]">Your teacher hasn&apos;t posted anything yet. Check back soon.</p>
+                  </div>
                 ) : (
                   announcements.map((item) => {
                     const tag = String(item.tag || 'General')
                     return (
-                      <article key={item.id} className="mb-3 rounded-xl border border-gray-700 bg-gray-800 p-4">
+                      <article key={item.id} className="mb-3 sb-card bg-[#0F1324] border-[#1C2333]">
                         <div className="flex items-center justify-between gap-2">
-                          <span className={`rounded-full px-2 py-0.5 text-xs ${getTagClasses(tag)}`}>
-                            {tag}
-                          </span>
-                          <span className="text-xs text-gray-400">{timeAgo(item.created_at || new Date().toISOString())}</span>
+                          <span className={`sb-badge ${getTagClasses(tag)}`}>{tag}</span>
+                          <span className="text-xs text-[#4B5563]">{timeAgo(item.created_at || new Date().toISOString())}</span>
                         </div>
                         <h3 className="mt-2 text-base font-semibold text-white">{item.title || 'Announcement'}</h3>
-                        <p className="mt-1 text-sm text-gray-300">{item.body || ''}</p>
-                        <p className="mt-3 text-xs text-gray-500">Posted by {item.teacher_name || subjectRow.teacher.full_name}</p>
+                        <p className="mt-1 text-sm text-[#CBD5E1]">{item.body || ''}</p>
+                        <p className="mt-3 text-xs text-[#4B5563]">Posted by {item.teacher_name || subjectRow.teacher.full_name}</p>
                       </article>
                     )
                   })
@@ -303,29 +304,33 @@ export default function OrgView() {
               <div>
                 {loadingExams ? (
                   <div className="py-8 flex justify-center">
-                    <div className="h-7 w-7 animate-spin rounded-full border-2 border-gray-700 border-t-indigo-500" />
+                    <div className="sb-spinner" />
                   </div>
                 ) : exams.length === 0 ? (
-                  <p className="py-8 text-center text-gray-500">No active exams available.</p>
+                  <div className="py-8 text-center">
+                    <p className="text-4xl" aria-hidden="true">📋</p>
+                    <p className="mt-3 text-lg font-semibold text-white">No exams scheduled</p>
+                    <p className="mt-2 text-sm text-[#4B5563]">When your teacher publishes an exam it will appear here.</p>
+                  </div>
                 ) : (
                   exams.map((ex) => (
-                    <article key={ex.id} className="mb-3 rounded-xl border border-gray-700 bg-gray-800 p-4">
+                    <article key={ex.id} className="mb-3 sb-card bg-[#0F1324] border-[#1C2333]">
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <h3 className="text-base font-semibold text-white">{ex.title}</h3>
-                          <p className="mt-1 text-sm text-gray-300">{ex.description || ''}</p>
-                          <div className="mt-2 flex items-center gap-4 text-xs text-gray-400">
+                          <p className="mt-1 text-sm text-[#CBD5E1]">{ex.description || ''}</p>
+                          <div className="mt-2 flex flex-wrap items-center gap-4 text-xs text-[#4B5563]">
                             <span>Type: {ex.exam_type?.toUpperCase()}</span>
                             <span>Duration: {ex.duration_mins} mins</span>
                             <span>Total: {ex.total_marks} marks</span>
                           </div>
                         </div>
-                        <span className="rounded-full bg-emerald-900/30 px-2 py-0.5 text-xs text-emerald-300">Active</span>
+                        <span className="sb-badge success">Active</span>
                       </div>
                       <div className="mt-3 flex gap-2">
                         <button
                           onClick={() => navigate(`/app/exam/${ex.id}/${ex.exam_type}`)}
-                          className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-500"
+                          className="sb-btn-primary text-xs px-4 py-2"
                         >
                           Start Exam
                         </button>
@@ -340,13 +345,12 @@ export default function OrgView() {
               <div>
                 {loadingLeaderboard ? (
                   <div className="py-8 flex justify-center">
-                    <div className="h-7 w-7 animate-spin rounded-full border-2 border-gray-700 border-t-indigo-500" />
+                    <div className="sb-spinner" />
                   </div>
                 ) : leaderboard.length === 0 ? (
-                  <p className="py-8 text-center text-gray-500">No leaderboard data yet. Complete an exam to see rankings!</p>
+                  <p className="py-8 text-center text-[#4B5563]">No leaderboard data yet. Complete an exam to see rankings!</p>
                 ) : (
                   <>
-                    {/* Podium */}
                     <div className="flex items-end justify-center gap-4 mb-6 pt-4">
                       {[1, 0, 2].map((idx) => {
                         const entry = leaderboard[idx]
@@ -356,31 +360,30 @@ export default function OrgView() {
                           <div key={idx} className="flex flex-col items-center">
                             <p className={`text-lg font-bold ${MEDAL_COLORS[idx]}`}>#{entry.rank}</p>
                             <p className="text-sm text-white font-medium mt-1 truncate max-w-[7rem]">{entry.student_name}</p>
-                            <p className="text-xs text-gray-400">{entry.total_score}</p>
-                            <div className={`${height} w-20 mt-2 rounded-t-lg ${idx === 0 ? 'bg-yellow-600/20' : idx === 1 ? 'bg-gray-600/20' : 'bg-amber-700/20'}`} />
+                            <p className="text-xs text-[#94A3B8]">{entry.total_score}</p>
+                            <div className={`${height} w-20 mt-2 rounded-t-lg ${idx === 0 ? 'bg-yellow-500/15' : idx === 1 ? 'bg-gray-400/15' : 'bg-amber-700/20'}`} />
                           </div>
                         )
                       })}
                     </div>
 
-                    {/* Table */}
-                    <div className="rounded-xl border border-gray-700 bg-gray-800 overflow-hidden">
+                    <div className="rounded-xl border border-[#1C2333] bg-[#0F1324] overflow-hidden">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-gray-700">
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Rank</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Student</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Score</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Exams</th>
+                          <tr className="border-b border-[#1C2333] bg-[rgba(148,163,184,0.05)]">
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase">Rank</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase">Student</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase">Score</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-[#4B5563] uppercase">Exams</th>
                           </tr>
                         </thead>
                         <tbody>
                           {leaderboard.map((e) => (
-                            <tr key={e.student_id || e.rank} className="border-b border-gray-700/50">
+                            <tr key={e.student_id || e.rank} className="border-b border-[#1C2333]/60 hover:bg-[rgba(148,163,184,0.04)]">
                               <td className="px-4 py-3 text-sm text-white">#{e.rank}</td>
                               <td className="px-4 py-3 text-sm text-white">{e.student_name}</td>
                               <td className="px-4 py-3 text-sm text-white">{e.total_score}</td>
-                              <td className="px-4 py-3 text-sm text-gray-400">{e.exams_attempted || '—'}</td>
+                              <td className="px-4 py-3 text-sm text-[#94A3B8]">{e.exams_attempted || '—'}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -399,7 +402,8 @@ export default function OrgView() {
 
 export function OrganizationAdminView() {
   const navigate = useNavigate()
-  const [session, setSession] = useState(() => getOrganizationSession())
+  const [session, setSession] = useState(null)
+  const [sessionChecked, setSessionChecked] = useState(false)
 
   const [org, setOrg] = useState(null)
   const [subjects, setSubjects] = useState([])
@@ -419,7 +423,35 @@ export function OrganizationAdminView() {
   const [teacherToDelete, setTeacherToDelete] = useState(null)
   const [deletingTeacherId, setDeletingTeacherId] = useState('')
 
+  useEffect(() => {
+    document.title = 'StudyBuddy — Organization'
+  }, [])
+
   const orgId = session?.org_id
+
+  useEffect(() => {
+    const storedSession = getOrganizationSession()
+
+    if (storedSession?.org_id) {
+      setSession(storedSession)
+      setSessionChecked(true)
+      return
+    }
+
+    const fallbackOrgId = localStorage.getItem('org_id') || localStorage.getItem('organizer_id')
+    const fallbackOrgName = localStorage.getItem('org_name')
+
+    if (fallbackOrgId || fallbackOrgName) {
+      setSession({
+        org_id: fallbackOrgId || null,
+        name: fallbackOrgName || '',
+      })
+    } else {
+      setSession(null)
+    }
+
+    setSessionChecked(true)
+  }, [])
 
   const loadDashboard = useCallback(async ({ silent = false } = {}) => {
     if (!orgId) return
@@ -451,13 +483,14 @@ export function OrganizationAdminView() {
   }, [orgId])
 
   useEffect(() => {
+    if (!sessionChecked) return
     if (!session?.org_id) {
-      navigate('/organization/login')
+      navigate('/organization/login', { replace: true })
       return
     }
 
     loadDashboard()
-  }, [session, loadDashboard, navigate])
+  }, [sessionChecked, session?.org_id, loadDashboard, navigate])
 
   const pendingBySubject = useMemo(() => {
     const groups = {}
@@ -589,7 +622,13 @@ export function OrganizationAdminView() {
     return org?.name || session?.name || 'Organization'
   }, [org, session])
 
-  if (!session) return null
+  if (!sessionChecked) {
+    return <div style={{ minHeight: '100vh', background: '#080B14' }} />
+  }
+
+  if (!session) {
+    return <div style={{ minHeight: '100vh', background: '#080B14' }} />
+  }
 
   return (
     <div className="min-h-screen bg-[#090b14] p-4 md:p-6">

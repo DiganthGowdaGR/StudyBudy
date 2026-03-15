@@ -1,0 +1,39 @@
+services:
+  backend:
+    build:
+      context: ./studybuddy-backend
+      dockerfile: Dockerfile.demo
+    container_name: studybuddy-backend
+    env_file:
+      - ./studybuddy-backend/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./studybuddy-backend/uploads:/app/uploads
+      - ./studybuddy-backend/vectorstore:/app/vectorstore
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./studybuddy-frontend
+      dockerfile: Dockerfile
+    container_name: studybuddy-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+    restart: unless-stopped
+
+  ngrok:
+    image: ngrok/ngrok:3
+    container_name: studybuddy-ngrok
+    profiles:
+      - tunnel
+    depends_on:
+      - frontend
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN:-}
+    command: http frontend:80 --log=stdout
+    ports:
+      - "4040:4040"
+    restart: unless-stopped

@@ -6,7 +6,7 @@ from fastapi.responses import StreamingResponse
 
 from models.schemas import TTSRequest
 from services.stt_service import transcribe_audio
-from services.tts_service import text_to_speech
+from services.tts_service import TTSUpstreamError, text_to_speech
 
 router = APIRouter()
 UPLOADS_DIR = Path("uploads")
@@ -37,5 +37,9 @@ async def text_to_speech_endpoint(body: TTSRequest):
             iter([audio_bytes]),
             media_type="audio/wav",
         )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except TTSUpstreamError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

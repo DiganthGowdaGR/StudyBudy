@@ -48,6 +48,10 @@ export default function OrgsPage() {
   const studentId = localStorage.getItem('student_id')
   const studentName = localStorage.getItem('student_name') || 'Student'
 
+  useEffect(() => {
+    document.title = 'StudyBuddy — My Classes'
+  }, [])
+
   const [subjects, setSubjects] = useState([])
   const [loadingSubjects, setLoadingSubjects] = useState(true)
   const [subjectCode, setSubjectCode] = useState('')
@@ -149,8 +153,10 @@ export default function OrgsPage() {
                 </div>
               ) : subjects.length === 0 ? (
                 <div className="flex min-h-[360px] flex-col items-center justify-center text-center">
-                  <p className="text-sm text-gray-500">No classes yet.</p>
-                  <p className="mt-1 text-sm text-gray-500">Use a subject code to request access.</p>
+                  <p className="text-5xl" aria-hidden="true">🏫</p>
+                  <p className="mt-3 text-lg font-semibold text-white">No classes yet</p>
+                  <p className="mt-2 text-sm text-gray-500">Enter a subject code from your teacher to join your first class</p>
+                  <p className="mt-1 text-sm text-gray-500">→ Use the Join a Class panel on the right</p>
                 </div>
               ) : (
                 <div className="max-h-[calc(100vh-190px)] overflow-y-auto pr-1">

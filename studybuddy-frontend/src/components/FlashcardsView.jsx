@@ -222,10 +222,10 @@ export default function FlashcardsView({
   }
 
   return (
-    <div className="h-full flex bg-[#0a0a0f]">
-      <aside className="w-56 border-r border-[#1e1e2e] bg-[#0d0e15] p-4 space-y-4 overflow-y-auto">
-        <section className="rounded-xl border border-[#25273b] bg-[#141522] p-4">
-          <p className="text-xs text-gray-500 uppercase tracking-wider">Your Subjects</p>
+    <div className="h-full flex bg-gradient-to-br from-[#070912] via-[#0a0f1e] to-[#0e162c] text-slate-200">
+      <aside className="w-56 border-r border-[#131933] bg-[#0a0f1e]/80 backdrop-blur p-4 space-y-4 overflow-y-auto shadow-[inset_-1px_0_0_rgba(99,102,241,0.08)]">
+        <section className="rounded-xl border border-[#151c32] bg-gradient-to-b from-[#0f1426] to-[#0b1020] p-4 shadow-[0_12px_28px_rgba(0,0,0,0.4)]">
+          <p className="text-xs text-slate-400 uppercase tracking-wider">Your Subjects</p>
           <div className="mt-3 space-y-2">
             <button
               type="button"
@@ -235,7 +235,7 @@ export default function FlashcardsView({
                 setShowAnswer(false)
               }}
               className={`w-full text-left rounded-lg px-3 py-2 text-sm transition-all ${
-                subjectFilter === 'all' ? 'bg-indigo-600 text-white' : 'bg-[#1b1d2e] text-gray-300 hover:text-white'
+                subjectFilter === 'all' ? 'bg-indigo-600 text-white shadow-[0_10px_22px_rgba(99,102,241,0.25)]' : 'bg-[#0f1426] text-slate-300 hover:text-white border border-[#1f2744]'
               }`}
             >
               All Subjects ({flashcards.length})
@@ -254,7 +254,7 @@ export default function FlashcardsView({
                       setShowAnswer(false)
                     }}
                     className={`w-full text-left rounded-lg px-3 py-2 text-sm transition-all ${
-                      subjectFilter === subject ? 'bg-indigo-600 text-white' : 'bg-[#1b1d2e] text-gray-300 hover:text-white'
+                      subjectFilter === subject ? 'bg-indigo-600 text-white shadow-[0_10px_22px_rgba(99,102,241,0.25)]' : 'bg-[#0f1426] text-slate-300 hover:text-white border border-[#1f2744]'
                     }`}
                   >
                     {subject} ({count})
@@ -262,32 +262,40 @@ export default function FlashcardsView({
                 )
               })
             ) : (
-              <p className="text-xs text-gray-500 text-center py-1">No subjects yet</p>
+              <p className="text-xs text-slate-500 text-center py-1">No subjects yet</p>
             )}
           </div>
         </section>
 
-        <section className="rounded-xl border border-[#25273b] bg-[#141522] p-4">
-          <p className="text-xs text-gray-500 uppercase tracking-wider">Study Progress</p>
+        <section className="rounded-xl border border-[#151c32] bg-gradient-to-b from-[#0f1426] to-[#0b1020] p-4 shadow-[0_12px_28px_rgba(0,0,0,0.4)]">
+          <p className="text-xs text-slate-400 uppercase tracking-wider">Study Progress</p>
           <div className="mt-3 flex items-center justify-between">
-            <p className="text-2xl font-bold text-indigo-400">{masteryPercent}%</p>
-            <p className="text-xs text-gray-500">Mastery</p>
+            <p className="text-2xl font-bold text-indigo-300">{masteryPercent}%</p>
+            <p className="text-xs text-slate-500">Mastery</p>
           </div>
-          <p className="text-xs text-gray-400 mt-2">{masteredCount} of {flashcards.length} cards mastered</p>
+          <p className="text-xs text-slate-400 mt-2">{masteredCount} of {flashcards.length} cards mastered</p>
         </section>
 
-        <section className="rounded-xl border border-[#25273b] bg-[#141522] p-4">
-          <p className="text-xs text-gray-500 uppercase tracking-wider">Current Streak</p>
+        <section className="rounded-xl border border-[#151c32] bg-gradient-to-b from-[#0f1426] to-[#0b1020] p-4 shadow-[0_12px_28px_rgba(0,0,0,0.4)]">
+          <p className="text-xs text-slate-400 uppercase tracking-wider">Current Streak</p>
           <p className="mt-2 text-2xl font-bold text-white">{reviewStats.streakDays} days</p>
-          <p className="text-xs text-gray-400 mt-1">Keep reviewing daily to grow mastery.</p>
+          <p className="text-xs text-slate-500 mt-1">Keep reviewing daily to grow mastery.</p>
         </section>
       </aside>
 
-      <main className="flex-1 p-6 overflow-y-auto">
+      <main className="flex-1 p-6 overflow-y-auto relative">
+        <div
+          className="absolute inset-0 opacity-10 pointer-events-none"
+          style={{
+            backgroundImage:
+              'linear-gradient(to right, rgba(255,255,255,0.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.12) 1px, transparent 1px)',
+            backgroundSize: '46px 46px'
+          }}
+        />
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-3xl font-bold text-white">Flashcards Session</h2>
-            <p className="text-sm text-gray-400 mt-1">Active recall mode with minimal distractions.</p>
+            <p className="text-sm text-slate-400 mt-1">Active recall mode with minimal distractions.</p>
           </div>
 
           <button
@@ -297,20 +305,20 @@ export default function FlashcardsView({
               setActionError('')
               setActionMessage('')
             }}
-            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium"
+            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium shadow-[0_14px_32px_rgba(99,102,241,0.25)]"
           >
             {showCreateForm ? 'Close Form' : 'New Card'}
           </button>
         </div>
 
         {showCreateForm && (
-          <form onSubmit={handleCreateCard} className="mt-4 rounded-xl border border-[#2c2d42] bg-[#141522] p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <form onSubmit={handleCreateCard} className="mt-4 rounded-xl border border-[#151c32] bg-gradient-to-r from-[#0f1426] via-[#0f172a] to-[#0b1020] p-4 grid grid-cols-1 md:grid-cols-2 gap-3 shadow-[0_16px_32px_rgba(0,0,0,0.35)]">
             <input
               type="text"
               value={form.subject}
               onChange={(e) => setForm((prev) => ({ ...prev, subject: e.target.value }))}
               placeholder="Subject"
-              className="bg-[#1a1b2a] border border-[#2c2d42] rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="bg-[#0f1426] border border-[#1f2744] rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <div />
             <textarea
@@ -318,14 +326,14 @@ export default function FlashcardsView({
               onChange={(e) => setForm((prev) => ({ ...prev, question: e.target.value }))}
               placeholder="Card question"
               rows={3}
-              className="bg-[#1a1b2a] border border-[#2c2d42] rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="bg-[#0f1426] border border-[#1f2744] rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <textarea
               value={form.answer}
               onChange={(e) => setForm((prev) => ({ ...prev, answer: e.target.value }))}
               placeholder="Card answer"
               rows={3}
-              className="bg-[#1a1b2a] border border-[#2c2d42] rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="bg-[#0f1426] border border-[#1f2744] rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <div className="md:col-span-2 flex items-center justify-between">
               <p className="text-red-400 text-xs">{actionError}</p>
@@ -334,11 +342,11 @@ export default function FlashcardsView({
                   type="button"
                   onClick={handleGenerateAnswer}
                   disabled={isGeneratingAnswer || !onGenerateAnswer}
-                  className="px-4 py-2 rounded-lg bg-[#1f2132] border border-[#2c2d42] text-gray-200 text-sm hover:text-white disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="px-4 py-2 rounded-lg bg-[#0f1426] border border-[#1f2744] text-slate-200 text-sm hover:text-white disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {isGeneratingAnswer ? 'Generating...' : 'AI Generate Answer'}
                 </button>
-                <button type="submit" className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm">
+                <button type="submit" className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm shadow-[0_12px_24px_rgba(99,102,241,0.25)]">
                   Save Card
                 </button>
               </div>
@@ -346,29 +354,29 @@ export default function FlashcardsView({
           </form>
         )}
 
-        <div className="mt-5 grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_280px] gap-5">
+        <div className="mt-5 grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_280px] gap-5 relative z-10">
           <div className="space-y-4">
-            <section className="rounded-2xl border border-[#212337] bg-[#11121b] min-h-[340px] p-5 md:p-6">
+            <section className="rounded-2xl border border-[#151c32] bg-gradient-to-b from-[#0f1426] to-[#0b0f1e] min-h-[340px] p-5 md:p-6 shadow-[0_16px_36px_rgba(0,0,0,0.4)]">
               {activeCard ? (
                 <>
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="rounded-md bg-[#1f2132] border border-[#2c2d42] px-2 py-1 text-[11px] text-gray-300 uppercase tracking-wider">
+                      <span className="rounded-md bg-[#0f1426] border border-[#1f2744] px-2 py-1 text-[11px] text-slate-200 uppercase tracking-wider">
                         {activeCard.subject || 'General'}
                       </span>
-                      <p className="text-xs text-gray-500">Card {boundedIndex + 1} / {filteredCards.length}</p>
+                      <p className="text-xs text-slate-500">Card {boundedIndex + 1} / {filteredCards.length}</p>
                     </div>
-                    <span className={`text-[11px] rounded-md px-2 py-1 border ${activeCard.mastered ? 'bg-emerald-900/30 text-emerald-300 border-emerald-700/50' : 'bg-[#1f2132] text-gray-300 border-[#2c2d42]'}`}>
+                    <span className={`text-[11px] rounded-md px-2 py-1 border ${activeCard.mastered ? 'bg-emerald-900/30 text-emerald-300 border-emerald-700/50' : 'bg-[#0f1426] text-slate-300 border-[#1f2744]'}`}>
                       {activeCard.mastered ? 'Mastered' : 'Learning'}
                     </span>
                   </div>
 
-                  <div className="mt-4 rounded-xl border border-[#2a2c42] bg-[#151726] p-4 md:p-5">
+                  <div className="mt-4 rounded-xl border border-[#1f2744] bg-[#0b1020] p-4 md:p-5 shadow-[0_12px_26px_rgba(0,0,0,0.35)]">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-[11px] uppercase tracking-wider text-gray-500">
+                      <p className="text-[11px] uppercase tracking-wider text-slate-500">
                         {showAnswer ? 'Back • Answer' : 'Front • Question'}
                       </p>
-                      <div className="rounded-lg border border-[#2c2d42] bg-[#1e2032] p-1 flex gap-1">
+                      <div className="rounded-lg border border-[#1f2744] bg-[#0f1426] p-1 flex gap-1">
                         <button
                           type="button"
                           onClick={handleShowFront}
@@ -397,7 +405,7 @@ export default function FlashcardsView({
                     <button
                       type="button"
                       onClick={handlePrev}
-                      className="px-3 py-1.5 rounded-lg bg-[#1e2032] border border-[#2c2d42] text-gray-300 hover:text-white"
+                      className="px-3 py-1.5 rounded-lg bg-[#0f1426] border border-[#1f2744] text-slate-200 hover:text-white"
                     >
                       Prev
                     </button>
@@ -411,7 +419,7 @@ export default function FlashcardsView({
                     <button
                       type="button"
                       onClick={handleNext}
-                      className="px-3 py-1.5 rounded-lg bg-[#1e2032] border border-[#2c2d42] text-gray-300 hover:text-white"
+                      className="px-3 py-1.5 rounded-lg bg-[#0f1426] border border-[#1f2744] text-slate-200 hover:text-white"
                     >
                       Next
                     </button>
@@ -420,17 +428,17 @@ export default function FlashcardsView({
               ) : (
                 <div className="h-full grid place-items-center text-center py-12">
                   <div>
-                    <p className="text-gray-400">No flashcards yet.</p>
-                    <p className="text-gray-500 text-sm mt-1">Create your first card to begin active recall.</p>
+                    <p className="text-slate-300">No flashcards yet.</p>
+                    <p className="text-slate-500 text-sm mt-1">Create your first card to begin active recall.</p>
                   </div>
                 </div>
               )}
             </section>
 
-            <section className="rounded-xl border border-[#25273b] bg-[#141522] p-4">
+            <section className="rounded-xl border border-[#151c32] bg-gradient-to-b from-[#0f1426] to-[#0b1020] p-4 shadow-[0_12px_28px_rgba(0,0,0,0.35)]">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs text-gray-500 uppercase tracking-wider">Card Deck</p>
-                <p className="text-xs text-gray-500">{filteredCards.length} cards</p>
+                <p className="text-xs text-slate-400 uppercase tracking-wider">Card Deck</p>
+                <p className="text-xs text-slate-500">{filteredCards.length} cards</p>
               </div>
 
               {filteredCards.length > 0 ? (
@@ -441,27 +449,27 @@ export default function FlashcardsView({
                       type="button"
                       onClick={() => handleSelectCard(index)}
                       title={card.question}
-                      className={`rounded-lg border p-3 text-left transition-all ${index === boundedIndex ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-[#1b1d2e] border-[#2d3044] hover:border-indigo-500/40'}`}
+                      className={`rounded-lg border p-3 text-left transition-all shadow-[0_10px_24px_rgba(0,0,0,0.3)] ${index === boundedIndex ? 'bg-indigo-600/20 border-indigo-500/50' : 'bg-[#0f1426] border-[#1f2744] hover:border-indigo-500/40'}`}
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] text-gray-500">#{index + 1}</span>
+                        <span className="text-[10px] text-slate-500">#{index + 1}</span>
                         {card.mastered && <span className="text-[10px] text-emerald-300">Mastered</span>}
                       </div>
-                      <p className="mt-2 text-[11px] uppercase tracking-wider text-gray-500">{card.subject || 'General'}</p>
-                      <p className="mt-1 text-sm text-gray-200 leading-snug">{truncateText(card.question, 84)}</p>
-                      <p className="mt-1 text-xs text-gray-500">{truncateText(card.answer, 70)}</p>
+                      <p className="mt-2 text-[11px] uppercase tracking-wider text-slate-500">{card.subject || 'General'}</p>
+                      <p className="mt-1 text-sm text-slate-100 leading-snug">{truncateText(card.question, 84)}</p>
+                      <p className="mt-1 text-xs text-slate-500">{truncateText(card.answer, 70)}</p>
                     </button>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-gray-500 text-center py-3">No cards in this filter.</p>
+                <p className="text-xs text-slate-500 text-center py-3">No cards in this filter.</p>
               )}
             </section>
           </div>
 
           <aside className="space-y-4">
-            <section className="rounded-xl border border-[#25273b] bg-[#141522] p-4">
-              <p className="text-xs text-gray-500 uppercase tracking-wider">Daily Goal</p>
+            <section className="rounded-xl border border-[#151c32] bg-gradient-to-b from-[#0f1426] to-[#0b1020] p-4 shadow-[0_12px_28px_rgba(0,0,0,0.35)]">
+              <p className="text-xs text-slate-400 uppercase tracking-wider">Daily Goal</p>
               <div className="mt-3 flex justify-center">
                 <ProgressRing
                   value={dailyGoalPercent}
@@ -472,24 +480,24 @@ export default function FlashcardsView({
                   label="goal"
                 />
               </div>
-              <p className="text-xs text-center text-gray-400 mt-2">{reviewStats.todayReviews} / {dailyGoalTarget} reviews today</p>
+              <p className="text-xs text-center text-slate-400 mt-2">{reviewStats.todayReviews} / {dailyGoalTarget} reviews today</p>
             </section>
 
-            <section className="rounded-xl border border-[#25273b] bg-[#141522] p-4">
-              <p className="text-xs text-gray-500 uppercase tracking-wider">Shortcuts</p>
+            <section className="rounded-xl border border-[#151c32] bg-gradient-to-b from-[#0f1426] to-[#0b1020] p-4 shadow-[0_12px_28px_rgba(0,0,0,0.35)]">
+              <p className="text-xs text-slate-400 uppercase tracking-wider">Shortcuts</p>
               <div className="mt-3 grid grid-cols-2 gap-2">
-                <button type="button" onClick={handleShowFront} className="rounded-lg bg-[#1f2132] border border-[#2c2d42] text-gray-300 text-xs py-2 hover:text-white">Front</button>
-                <button type="button" onClick={handleShowBack} className="rounded-lg bg-[#1f2132] border border-[#2c2d42] text-gray-300 text-xs py-2 hover:text-white">Back</button>
-                <button type="button" onClick={handlePrev} className="rounded-lg bg-[#1f2132] border border-[#2c2d42] text-gray-300 text-xs py-2 hover:text-white">Prev</button>
-                <button type="button" onClick={handleNext} className="rounded-lg bg-[#1f2132] border border-[#2c2d42] text-gray-300 text-xs py-2 hover:text-white">Next</button>
-                <button type="button" onClick={handleMastered} className="rounded-lg bg-[#1f2132] border border-[#2c2d42] text-gray-300 text-xs py-2 hover:text-white">Mastered</button>
-                <button type="button" onClick={handleShare} className="rounded-lg bg-[#1f2132] border border-[#2c2d42] text-gray-300 text-xs py-2 hover:text-white">Share</button>
+                <button type="button" onClick={handleShowFront} className="rounded-lg bg-[#0f1426] border border-[#1f2744] text-slate-200 text-xs py-2 hover:text-white">Front</button>
+                <button type="button" onClick={handleShowBack} className="rounded-lg bg-[#0f1426] border border-[#1f2744] text-slate-200 text-xs py-2 hover:text-white">Back</button>
+                <button type="button" onClick={handlePrev} className="rounded-lg bg-[#0f1426] border border-[#1f2744] text-slate-200 text-xs py-2 hover:text-white">Prev</button>
+                <button type="button" onClick={handleNext} className="rounded-lg bg-[#0f1426] border border-[#1f2744] text-slate-200 text-xs py-2 hover:text-white">Next</button>
+                <button type="button" onClick={handleMastered} className="rounded-lg bg-[#0f1426] border border-[#1f2744] text-slate-200 text-xs py-2 hover:text-white">Mastered</button>
+                <button type="button" onClick={handleShare} className="rounded-lg bg-[#0f1426] border border-[#1f2744] text-slate-200 text-xs py-2 hover:text-white">Share</button>
                 <button
                   type="button"
                   onClick={handleDelete}
                   title="Delete card"
                   aria-label="Delete card"
-                  className="col-span-2 rounded-lg bg-[#3a1e2a] border border-[#5f3347] text-red-200 py-2 flex items-center justify-center hover:bg-red-600 hover:text-white"
+                  className="col-span-2 rounded-lg bg-[#2d1020] border border-[#4b1f31] text-red-200 py-2 flex items-center justify-center hover:bg-red-600 hover:text-white"
                 >
                   <TrashIcon className="h-4 w-4" />
                 </button>

@@ -29,6 +29,12 @@ export function getTeacherSession() {
 export function setTeacherSession(session) {
   const normalized = normalizeTeacherSession(session || {})
   localStorage.setItem(TEACHER_SESSION_KEY, JSON.stringify(normalized || {}))
+
+  if (normalized?.teacher_id) {
+    localStorage.setItem('teacher_id', String(normalized.teacher_id))
+  } else {
+    localStorage.removeItem('teacher_id')
+  }
 }
 
 export function setTeacherActiveSubject(subjectId) {
@@ -43,6 +49,7 @@ export function setTeacherActiveSubject(subjectId) {
 
 export function clearTeacherSession() {
   localStorage.removeItem(TEACHER_SESSION_KEY)
+  localStorage.removeItem('teacher_id')
 }
 
 export { TEACHER_SESSION_KEY }

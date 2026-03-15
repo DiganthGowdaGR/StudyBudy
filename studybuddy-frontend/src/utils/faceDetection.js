@@ -33,7 +33,31 @@ export async function startFaceDetection(studentId, onEmotionDetected, videoRef)
     throw new Error('Video preview element is not ready.')
   }
 
-  const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+  let stream
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: 'user',
+      },
+      audio: false,
+    })
+  } catch (err) {
+    const errorName = String(err?.name || '')
+
+    if (errorName === 'NotAllowedError' || errorName === 'SecurityError') {
+      throw new Error('Camera permission is blocked. Please allow camera access and try again.')
+    }
+
+    if (errorName === 'NotFoundError' || errorName === 'DevicesNotFoundError') {
+      throw new Error('No camera device was found on this system.')
+    }
+
+    if (errorName === 'NotReadableError' || errorName === 'TrackStartError') {
+      throw new Error('Camera is busy in another app. Close other camera apps and retry.')
+    }
+
+    throw new Error(err?.message || 'Unable to access camera right now.')
+  }
 
   videoElement.srcObject = stream
   await videoElement.play()
