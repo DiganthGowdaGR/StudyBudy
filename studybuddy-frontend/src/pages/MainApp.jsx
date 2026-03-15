@@ -14,6 +14,7 @@ import { api } from '../services/api'
 
 const TAB_ITEMS = [
   { id: 'home', label: 'Home' },
+  { id: 'workspace', label: 'Workspace' },
   { id: 'organizations', label: 'My Classes' },
   { id: 'library', label: 'Library' },
   { id: 'flashcards', label: 'Flashcards' },
@@ -699,7 +700,11 @@ export default function MainApp() {
     setCustomEvents((prev) => prev.filter((event) => String(event.id) !== String(eventId)))
   }
 
-
+  const handleVoiceScheduleCreated = (event) => {
+    if (!event) return
+    const created = mapScheduleEventFromApi(event)
+    setCustomEvents((prev) => [...prev, created].sort(sortScheduleEvents))
+  }
 
   const handleEmotionDetected = useCallback((emotion, confidence) => {
     const normalizedEmotion = String(emotion || 'no_face').toLowerCase()
@@ -945,13 +950,12 @@ export default function MainApp() {
 
       <video ref={captureVideoRef} className="hidden" muted />
 
-      {isWorkspaceTab && (
-        <VoiceOrb
-          studentId={student.id}
-          onResult={handleVoiceResult}
-          speakText={speakText}
-        />
-      )}
+      <VoiceOrb
+        studentId={student.id}
+        onResult={handleVoiceResult}
+        speakText={speakText}
+        onScheduleCreated={handleVoiceScheduleCreated}
+      />
     </div>
   )
 }

@@ -116,6 +116,23 @@ function SpeakerIcon({ className }) {
   )
 }
 
+function ThinkingIcon({ className }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="6" cy="12" r="1.5" fill="currentColor">
+        <animate attributeName="opacity" values="1;0.3;1" dur="1.2s" begin="0s" repeatCount="indefinite" />
+      </circle>
+      <circle cx="12" cy="12" r="1.5" fill="currentColor">
+        <animate attributeName="opacity" values="1;0.3;1" dur="1.2s" begin="0.4s" repeatCount="indefinite" />
+      </circle>
+      <circle cx="18" cy="12" r="1.5" fill="currentColor">
+        <animate attributeName="opacity" values="1;0.3;1" dur="1.2s" begin="0.8s" repeatCount="indefinite" />
+      </circle>
+    </svg>
+  )
+}
+
+
 export default function VoiceOrb({ studentId, onResult, speakText, onScheduleCreated }) {
   const WAVE_BARS = [8, 14, 22, 16, 10, 18, 26, 20, 12, 18, 24, 17, 9]
   const [isRecording, setIsRecording] = useState(false)
@@ -369,7 +386,7 @@ export default function VoiceOrb({ studentId, onResult, speakText, onScheduleCre
           ) : isRecording ? (
             <MicIcon className="h-5 w-5" />
           ) : isProcessing ? (
-            <SpeakerIcon className="h-5 w-5" />
+            <ThinkingIcon className="h-5 w-5" />
           ) : (
             <MicIcon className="h-5 w-5" />
           )}
