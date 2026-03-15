@@ -145,65 +145,65 @@ export default function LibraryView({ documents, onUpload, onGenerate, onOpenWor
   }
 
   return (
-    <div className="h-full flex bg-[#0a0a0f]">
-      <aside className="w-56 border-r border-[#1e1e2e] bg-[#0d0e15] p-4 flex flex-col">
-        <div>
-          <p className="text-xs uppercase tracking-widest text-gray-500">Core Subjects</p>
-          <div className="mt-3 space-y-2">
+    <div className="h-full flex bg-[#080B14] text-[#94A3B8]">
+      <aside className="w-64 border-r border-[#1C2333] bg-[rgba(12,16,26,0.95)] p-4 flex flex-col gap-4">
+        <div className="sb-card bg-[#0F1324] border-[#1C2333]">
+          <p className="sb-eyebrow">Core Subjects</p>
+          <div className="mt-3 space-y-2 max-h-48 overflow-y-auto pr-1">
             {subjects.length > 0 ? (
               subjects.map(([subject, count]) => (
-                <div key={subject} className="rounded-lg border border-[#25273b] bg-[#141522] px-3 py-2 flex items-center justify-between">
-                  <span className="text-xs text-gray-300 truncate pr-2">{subject}</span>
-                  <span className="text-[10px] text-indigo-400">{count}</span>
+                <div key={subject} className="rounded-lg border border-[#1C2333] bg-[#0D1117] px-3 py-2 flex items-center justify-between">
+                  <span className="text-xs text-white truncate pr-2">{subject}</span>
+                  <span className="text-[10px] text-[#6366F1]">{count}</span>
                 </div>
               ))
             ) : (
-              <p className="text-xs text-gray-500 text-center py-2">No subjects yet</p>
+              <p className="text-xs text-[#4B5563] text-center py-2">No subjects yet</p>
             )}
           </div>
         </div>
 
-        <div className="mt-6">
-          <p className="text-xs uppercase tracking-widest text-gray-500">Collections</p>
-          <div className="mt-3 space-y-2 text-xs text-gray-300">
-            <div className="rounded-lg border border-[#25273b] bg-[#141522] px-3 py-2 flex items-center justify-between">
+        <div className="sb-card bg-[#0F1324] border-[#1C2333] space-y-2">
+          <p className="sb-eyebrow">Collections</p>
+          <div className="space-y-2 text-xs text-white">
+            <div className="rounded-lg border border-[#1C2333] bg-[#0D1117] px-3 py-2 flex items-center justify-between">
               <span>All Resources</span>
-              <span className="text-indigo-400">{documents.length}</span>
+              <span className="text-[#6366F1]">{documents.length}</span>
             </div>
-            <div className="rounded-lg border border-[#25273b] bg-[#141522] px-3 py-2 flex items-center justify-between">
+            <div className="rounded-lg border border-[#1C2333] bg-[#0D1117] px-3 py-2 flex items-center justify-between">
               <span>Needs Notes</span>
-              <span className="text-indigo-400">{documents.filter((doc) => !doc.summary).length}</span>
+              <span className="text-[#6366F1]">{documents.filter((doc) => !doc.summary).length}</span>
             </div>
           </div>
         </div>
 
-        <div className="mt-auto rounded-xl border border-[#2a2b3f] bg-[#141522] p-3">
-          <p className="text-xs text-gray-400 uppercase tracking-wider">Storage Status</p>
+        <div className="sb-card bg-[#0F1324] border-[#1C2333] mt-auto">
+          <p className="sb-eyebrow">Storage Status</p>
           <div className="mt-3 flex items-center gap-3">
             <ProgressRing
               value={usagePercent}
               size={72}
               stroke={7}
-              progressClass="stroke-indigo-500"
-              trackClass="stroke-[#26283b]"
+              progressClass="stroke-[#6366F1]"
+              trackClass="stroke-[#1C2333]"
               label="used"
             />
             <div>
               <p className="text-sm text-white font-semibold">{documents.length} resources</p>
-              <p className="text-[11px] text-gray-400">Limit: {resourceLimit}</p>
+              <p className="text-[11px] text-[#4B5563]">Limit: {resourceLimit}</p>
             </div>
           </div>
-          {uploading && <p className="text-xs text-indigo-300 mt-1">Uploading resource...</p>}
+          {uploading && <p className="text-xs text-[#6366F1] mt-1">Uploading resource...</p>}
           {uploadError && <p className="text-red-400 text-xs mt-1">{uploadError}</p>}
-          {uploadSuccess && <p className="text-green-400 text-xs mt-1">Uploaded: {uploadSuccess}</p>}
+          {uploadSuccess && <p className="text-emerald-300 text-xs mt-1">Uploaded: {uploadSuccess}</p>}
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto p-6">
+      <main className="flex-1 overflow-y-auto p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-4xl font-bold text-white">Mission Archives</h2>
-            <p className="text-sm text-gray-400 mt-1">Secure storage for all your academic resources.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white">Mission Archives</h2>
+            <p className="text-sm text-[#4B5563] mt-1">Secure storage for all your academic resources.</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -213,7 +213,7 @@ export default function LibraryView({ documents, onUpload, onGenerate, onOpenWor
                 setActiveFilter('all')
                 setSearchQuery('')
               }}
-              className="px-4 py-2 rounded-xl border border-[#2c2d42] bg-[#171827] text-gray-300 text-sm hover:border-indigo-500 hover:text-white transition-all"
+              className="sb-btn-secondary text-sm px-4 py-2"
             >
               Reset
             </button>
@@ -228,23 +228,23 @@ export default function LibraryView({ documents, onUpload, onGenerate, onOpenWor
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition-all"
+              className="sb-btn-primary text-sm px-4 py-2"
             >
               New Resource
             </button>
           </div>
         </div>
 
-        <div className="mt-5 flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {FILTERS.map((filter) => (
             <button
               key={filter.id}
               type="button"
               onClick={() => setActiveFilter(filter.id)}
-              className={`rounded-lg px-3 py-1.5 text-xs transition-all ${
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all border ${
                 activeFilter === filter.id
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-[#171827] text-gray-400 hover:text-white border border-[#2c2d42]'
+                  ? 'border-[rgba(99,102,241,0.35)] bg-[rgba(99,102,241,0.14)] text-white shadow-[0_0_18px_rgba(99,102,241,0.2)]'
+                  : 'border-[#1C2333] bg-[#0F1324] text-[#94A3B8] hover:text-white hover:border-[#6366F1]/60'
               }`}
             >
               {filter.label}
@@ -256,7 +256,7 @@ export default function LibraryView({ documents, onUpload, onGenerate, onOpenWor
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search mission archives..."
-            className="ml-auto max-w-72 w-full bg-[#171827] border border-[#2c2d42] rounded-xl px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="ml-auto max-w-72 w-full sb-input"
           />
         </div>
 
@@ -270,23 +270,23 @@ export default function LibraryView({ documents, onUpload, onGenerate, onOpenWor
               const subject = getSubjectFromFilename(doc.filename)
 
               return (
-                <article key={doc.id} className="rounded-2xl border border-[#23243a] bg-[#131420] p-4 flex flex-col">
+                <article key={doc.id} className="sb-card bg-[#0F1324] border-[#1C2333] flex flex-col">
                   <div className="flex items-center justify-between">
-                    <span className="rounded-md bg-[#20233a] text-indigo-300 text-[10px] uppercase tracking-widest px-2 py-1">{type}</span>
-                    <span className="text-gray-500 text-xs">{formatRelativeTime(doc.upload_time)}</span>
+                    <span className="sb-badge" style={{ background: 'rgba(99,102,241,0.12)', color: '#6366F1', borderColor: 'rgba(99,102,241,0.25)' }}>{type}</span>
+                    <span className="text-[#4B5563] text-xs">{formatRelativeTime(doc.upload_time)}</span>
                   </div>
 
-                  <h3 className="mt-3 text-lg font-semibold text-white leading-snug">{doc.filename}</h3>
-                  <p className="mt-2 text-sm text-gray-400 leading-relaxed">{summarize(doc.summary)}</p>
+                  <h3 className="mt-3 text-lg font-semibold text-white leading-snug break-words">{doc.filename}</h3>
+                  <p className="mt-2 text-sm text-[#94A3B8] leading-relaxed">{summarize(doc.summary)}</p>
 
                   <div className="mt-4 flex items-center justify-between gap-2">
-                    <span className="text-[10px] rounded-full bg-[#20233a] text-indigo-300 px-2 py-1 uppercase tracking-wider">{subject}</span>
+                    <span className="sb-badge" style={{ background: 'rgba(148,163,184,0.12)', color: '#CBD5E1', borderColor: 'rgba(148,163,184,0.3)' }}>{subject}</span>
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={() => handleGenerate(doc)}
                         disabled={activeGenerateId === doc.id}
-                        className="text-xs rounded-lg bg-[#25283b] hover:bg-indigo-600 text-gray-300 hover:text-white px-3 py-1.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="sb-btn-secondary text-xs px-3 py-2 disabled:opacity-60"
                       >
                         {activeGenerateId === doc.id ? (
                           <span className="inline-flex items-center gap-1">
@@ -302,7 +302,7 @@ export default function LibraryView({ documents, onUpload, onGenerate, onOpenWor
                         type="button"
                         onClick={() => handleDelete(doc)}
                         disabled={activeDeleteId === doc.id}
-                        className="text-xs rounded-lg bg-[#3a1e2a] hover:bg-red-600 text-red-100 px-3 py-1.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="rounded-lg border border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.12)] text-[11px] text-[#FCA5A5] px-3 py-2 transition-all hover:border-[rgba(239,68,68,0.6)] hover:bg-[rgba(239,68,68,0.18)] disabled:opacity-60 disabled:cursor-not-allowed"
                       >
                         {activeDeleteId === doc.id ? 'Deleting...' : 'Delete'}
                       </button>
@@ -312,9 +312,9 @@ export default function LibraryView({ documents, onUpload, onGenerate, onOpenWor
               )
             })
           ) : (
-            <div className="col-span-full rounded-2xl border border-dashed border-[#2c2d42] bg-[#121320] p-8 text-center">
-              <p className="text-gray-400">No resources found for this filter.</p>
-              <p className="text-gray-500 text-sm mt-1">Upload a PDF to start your archive.</p>
+            <div className="col-span-full rounded-2xl border border-dashed border-[#1C2333] bg-[#0D1117] p-8 text-center">
+              <p className="text-[#4B5563]">No resources found for this filter.</p>
+              <p className="text-[#2E3647] text-sm mt-1">Upload a PDF to start your archive.</p>
             </div>
           )}
         </div>

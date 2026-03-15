@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import HomeView from '../components/HomeView'
 import WorkspaceView from '../components/WorkspaceView'
 import LibraryView from '../components/LibraryView'
@@ -12,13 +12,126 @@ import { startFaceDetection, stopFaceDetection } from '../utils/faceDetection'
 import { getEmotionResponse } from '../utils/emotionReactions'
 import { api } from '../services/api'
 
+function SidebarHomeIcon({ className = 'h-[18px] w-[18px]' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="m3 12 2-2 7-7 7 7 2 2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function SidebarClassesIcon({ className = 'h-[18px] w-[18px]' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="m3 9 9-5 9 5-9 5-9-5Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
+      <path d="M7 11v4.2c0 .8 2 2.8 5 2.8s5-2 5-2.8V11" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M21 9v5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function SidebarLibraryIcon({ className = 'h-[18px] w-[18px]' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="M6.5 4h10A1.5 1.5 0 0 1 18 5.5v13A1.5 1.5 0 0 1 16.5 20h-10A1.5 1.5 0 0 1 5 18.5v-13A1.5 1.5 0 0 1 6.5 4Z" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M9 8h6M9 12h6M9 16h4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function SidebarFlashcardsIcon({ className = 'h-[18px] w-[18px]' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <rect x="4" y="7" width="13" height="10" rx="2" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M9 5h9a2 2 0 0 1 2 2v8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M8 11h5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function SidebarScheduleIcon({ className = 'h-[18px] w-[18px]' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M8 3v4M16 3v4M4 9h16" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M8.5 13h.01M12 13h.01M15.5 13h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function SidebarSenseiIcon({ className = 'h-[18px] w-[18px]' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <rect x="9" y="4" width="6" height="10" rx="3" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M6 11a6 6 0 0 0 12 0" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M12 17v3M9 20h6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function SidebarLogoutIcon({ className = 'h-[18px] w-[18px]' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="M10 5.5V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6a2 2 0 0 1-2-2v-.5" stroke="currentColor" strokeWidth="1.7" />
+      <path d="m14 12-9 0M8 9l-3 3 3 3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function TopBarBellIcon({ className = 'h-[18px] w-[18px]' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="M6.5 9.5a5.5 5.5 0 1 1 11 0v4.3l1.5 2.2H5l1.5-2.2V9.5Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
+      <path d="M10 18a2 2 0 0 0 4 0" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function SidebarBrandIcon({ className = 'h-5 w-5' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="M6 6.5A2.5 2.5 0 0 1 8.5 4h8A1.5 1.5 0 0 1 18 5.5V18a1.5 1.5 0 0 1-1.5 1.5h-8A2.5 2.5 0 0 0 6 22V6.5Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
+      <path d="M6 7.5A2.5 2.5 0 0 1 8.5 5H18" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M10 9h4M10 12h4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function SidebarMenuIcon({ className = 'h-4.5 w-4.5' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 const TAB_ITEMS = [
-  { id: 'home', label: 'Home' },
-  { id: 'organizations', label: 'My Classes' },
-  { id: 'library', label: 'Library' },
-  { id: 'flashcards', label: 'Flashcards' },
-  { id: 'schedule', label: 'Schedule' },
+  { id: 'home', label: 'Home', Icon: SidebarHomeIcon, path: '/app' },
+  { id: 'organizations', label: 'My Classes', Icon: SidebarClassesIcon, path: '/app/organizations' },
+  { id: 'library', label: 'Library', Icon: SidebarLibraryIcon, path: '/app/library' },
+  { id: 'flashcards', label: 'Flashcards', Icon: SidebarFlashcardsIcon, path: '/app/flashcards' },
+  { id: 'schedule', label: 'Schedule', Icon: SidebarScheduleIcon, path: '/app/schedule' },
 ]
+
+const TAB_TITLES = {
+  home: 'Home',
+  organizations: 'My Classes',
+  library: 'Library',
+  flashcards: 'Flashcards',
+  schedule: 'Schedule',
+  workspace: 'Talk to Sensei',
+}
+
+function getTabFromPath(pathname) {
+  const path = String(pathname || '')
+  if (path === '/app/organizations') return 'organizations'
+  if (path === '/app/library') return 'library'
+  if (path === '/app/flashcards') return 'flashcards'
+  if (path === '/app/schedule') return 'schedule'
+  if (path === '/app/workspace') return 'workspace'
+  return 'home'
+}
 
 function todayKey() {
   return new Date().toISOString().slice(0, 10)
@@ -59,10 +172,13 @@ function normalizeTime(value, fallback) {
 }
 
 function mapScheduleEventFromApi(row) {
+  const safeSubject = row.subject || 'General'
+  const safeTitle = row.title || `${safeSubject} Study Session`
+
   return {
     id: String(row.id),
-    title: row.title || 'Untitled Event',
-    subject: row.subject || 'General',
+    title: safeTitle,
+    subject: safeSubject,
     date: String(row.date || ''),
     startTime: normalizeTime(row.start_time, '09:00'),
     endTime: normalizeTime(row.end_time, '10:00'),
@@ -77,6 +193,7 @@ function sortScheduleEvents(a, b) {
 
 export default function MainApp() {
   const navigate = useNavigate()
+  const location = useLocation()
   const studentId = localStorage.getItem('student_id')
   const storageSuffix = studentId || 'guest'
   const activeWorkspaceStorageKey = `studybuddy_active_workspace_${storageSuffix}`
@@ -87,7 +204,8 @@ export default function MainApp() {
   })
   const studentName = student.name || 'Student'
 
-  const [activeTab, setActiveTab] = useState('home')
+  const [activeTab, setActiveTab] = useState(() => getTabFromPath(location.pathname))
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [greeting, setGreeting] = useState('')
   const [documents, setDocuments] = useState([])
 
@@ -157,6 +275,11 @@ export default function MainApp() {
     const streakDays = calculateStreak(history)
     return { todayReviews, streakDays, history }
   }, [flashStats])
+
+  useEffect(() => {
+    setActiveTab(getTabFromPath(location.pathname))
+    setMobileSidebarOpen(false)
+  }, [location.pathname])
 
   useEffect(() => {
     if (!activeWorkspaceId) return
@@ -415,6 +538,7 @@ export default function MainApp() {
 
       setSpeakText(`Your notes for ${doc.filename} are ready!`)
       setActiveTab('workspace')
+      navigate('/app/workspace')
       return res
     } catch (err) {
       console.error('Notes failed', err)
@@ -557,6 +681,16 @@ export default function MainApp() {
     }
   }
 
+  const handleVoiceScheduleCreated = useCallback((eventRow) => {
+    if (!eventRow) return
+
+    const mapped = mapScheduleEventFromApi(eventRow)
+    setCustomEvents((prev) => {
+      const withoutDuplicate = prev.filter((event) => String(event.id) !== String(mapped.id))
+      return [...withoutDuplicate, mapped].sort(sortScheduleEvents)
+    })
+  }, [])
+
   const handleDeleteTalk = async (talkId) => {
     if (!talkId) return
     await api.deleteTalk(student.id, talkId)
@@ -571,6 +705,7 @@ export default function MainApp() {
   const handleOpenWorkspace = (workspaceId) => {
     setActiveWorkspaceId(String(workspaceId))
     setActiveTab('workspace')
+    navigate('/app/workspace')
   }
 
   const handleCreateWorkspace = async (workspaceName) => {
@@ -616,6 +751,7 @@ export default function MainApp() {
 
     setActiveWorkspaceId(created.id)
     setActiveTab('workspace')
+    navigate('/app/workspace')
   }
 
   const handleDeleteWorkspace = async (workspaceId) => {
@@ -643,6 +779,7 @@ export default function MainApp() {
     if (String(workspaceId) === String(activeWorkspaceId)) {
       setActiveWorkspaceId(String(remaining[0].id))
       setActiveTab('workspace')
+      navigate('/app/workspace')
     }
   }
 
@@ -726,13 +863,25 @@ export default function MainApp() {
   }, [studentName, isWorkspaceTab])
 
   const handleStartFaceDetection = useCallback(async () => {
-    if (!student.id) return
+    if (!student.id) {
+      throw new Error('Student session not found. Please log in again to enable Focus Mode.')
+    }
 
     setFaceDetectionError('')
 
     const stream = await startFaceDetection(student.id, handleEmotionDetected, captureVideoRef)
     cameraStreamRef.current = stream
     setFaceDetectionOn(true)
+
+    // Attach stream after PiP mounts to avoid a blank preview on first toggle.
+    window.requestAnimationFrame(() => {
+      const previewVideo = previewVideoRef.current
+      if (!previewVideo) return
+
+      previewVideo.srcObject = stream
+      previewVideo.play().catch(() => {})
+    })
+
     setCurrentEmotion('neutral')
     lastReactedEmotionRef.current = null
     setLastReactedEmotion(null)
@@ -781,159 +930,269 @@ export default function MainApp() {
     navigate('/')
   }
 
-  return (
-    <div className="h-screen w-full bg-[#0a0a0f] md:overflow-hidden overflow-y-auto">
-      <header className="fixed top-0 left-0 right-0 h-14 bg-[#111118] border-b border-[#1e1e2e] flex items-center justify-between px-6 z-40">
-        <div className="flex items-center gap-6 min-w-0">
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="h-6 w-6 rounded-md bg-indigo-600 border border-indigo-500 grid place-items-center">
-              <span className="h-2 w-2 rounded-sm bg-white" />
-            </span>
-            <p className="text-white font-semibold">StudyBuddy</p>
-          </div>
+  const handleNavigateTab = useCallback((tabId) => {
+    const target = TAB_ITEMS.find((tab) => tab.id === tabId)
+    if (!target) return
 
-          <nav className="hidden md:flex items-center gap-1 bg-[#171827] border border-[#2c2d42] rounded-xl p-1">
-            {TAB_ITEMS.map((tab) => (
+    setActiveTab(tabId)
+    navigate(target.path)
+    setMobileSidebarOpen(false)
+  }, [navigate])
+
+  const handleSenseiNavigation = useCallback(() => {
+    setActiveTab('workspace')
+    navigate('/app/workspace')
+    setMobileSidebarOpen(false)
+  }, [navigate])
+
+  const studentInitial = String(studentName || 'S').charAt(0).toUpperCase()
+  const pageTitle = TAB_TITLES[activeTab] || 'Home'
+  const hasUnreadNotifications = pendingClassesCount(sessions, reviewStats)
+
+  useEffect(() => {
+    const titleMap = {
+      home: 'StudyBuddy — Home',
+      workspace: 'StudyBuddy — Home',
+      organizations: 'StudyBuddy — My Classes',
+      library: 'StudyBuddy — Library',
+      schedule: 'StudyBuddy — Schedule',
+      flashcards: 'StudyBuddy — Flashcards',
+    }
+
+    document.title = titleMap[activeTab] || 'StudyBuddy — Home'
+  }, [activeTab])
+
+  function pendingClassesCount(sessionRows, stats) {
+    const recentSessionCount = Array.isArray(sessionRows) ? sessionRows.length : 0
+    const reviewsToday = Number(stats?.todayReviews || 0)
+    return recentSessionCount > 0 || reviewsToday > 0
+  }
+
+  return (
+    <div className="h-screen w-full bg-[#080B14] text-[#94A3B8] overflow-hidden">
+      {mobileSidebarOpen && (
+        <button
+          type="button"
+          aria-label="Close navigation"
+          onClick={() => setMobileSidebarOpen(false)}
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+        />
+      )}
+
+      <aside
+        className={`fixed top-0 left-0 z-50 h-screen w-[220px] border-r border-[#1C2333] bg-[#080B14] flex flex-col transition-transform duration-200 ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+      >
+        <div className="px-4 pt-5 pb-4">
+          <div className="flex items-center gap-2.5">
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                boxShadow: '0 0 12px rgba(99,102,241,0.3)'
+              }}
+            >
+              <SidebarBrandIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-[15px] font-bold text-white leading-none">StudyBuddy</p>
+              <p className="text-[10px] text-[#4B5563] leading-none mt-0.5">AI Study Companion</p>
+            </div>
+          </div>
+          <div className="my-4 border-b border-[#1C2333]" />
+        </div>
+
+        <div className="mx-3 mb-4 rounded-xl border border-[rgba(99,102,241,0.15)] bg-[rgba(99,102,241,0.08)] p-3">
+          <div className="flex items-center gap-2.5">
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '999px',
+                background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+                display: 'grid',
+                placeItems: 'center',
+                fontSize: '13px',
+                fontWeight: 700,
+                color: 'white'
+              }}
+            >
+              {studentInitial}
+            </div>
+            <div>
+              <p className="text-[13px] font-semibold text-white leading-none">{studentName}</p>
+              <span className="inline-flex mt-1 rounded-full bg-[rgba(99,102,241,0.1)] px-2 py-0.5 text-[10px] text-[#6366F1]">Student</span>
+            </div>
+          </div>
+        </div>
+
+        <p className="px-4 mb-2 text-[10px] font-semibold tracking-[0.1em] uppercase text-[#374151]">WORKSPACE</p>
+
+        <nav className="space-y-0.5">
+          {TAB_ITEMS.map((tab) => {
+            const isActive = activeTab === tab.id
+            const Icon = tab.Icon
+
+            return (
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-gray-400 hover:text-white'
-                }`}
+                onClick={() => handleNavigateTab(tab.id)}
+                className={`w-[calc(100%-16px)] text-left flex items-center gap-2.5 rounded-[10px] py-[9px] pr-4 text-[13px] transition-all ${isActive ? 'bg-[rgba(99,102,241,0.12)] border-l-2 border-[#6366F1] ml-[6px] pl-[14px] text-white font-semibold' : 'ml-2 pl-4 text-[#4B5563] hover:bg-white/5 hover:text-white font-medium'}`}
               >
-                {tab.label}
+                <span className={`${isActive ? 'text-[#6366F1]' : 'text-[#4B5563]'}`}>
+                  <Icon className="h-[18px] w-[18px]" />
+                </span>
+                <span>{tab.label}</span>
               </button>
-            ))}
-          </nav>
+            )
+          })}
+        </nav>
+
+        <p className="px-4 mt-4 mb-2 text-[10px] font-semibold tracking-[0.1em] uppercase text-[#374151]">SENSEI</p>
+        <div>
+          <button
+            type="button"
+            onClick={handleSenseiNavigation}
+            className={`w-[calc(100%-16px)] text-left flex items-center gap-2.5 rounded-[10px] py-[9px] pr-4 text-[13px] transition-all ${activeTab === 'workspace' ? 'bg-[rgba(99,102,241,0.12)] border-l-2 border-[#6366F1] ml-[6px] pl-[14px] text-white font-semibold' : 'ml-2 pl-4 text-[#4B5563] hover:bg-white/5 hover:text-white font-medium'}`}
+          >
+            <span className={`${activeTab === 'workspace' ? 'text-[#6366F1]' : 'text-[#4B5563]'}`}>
+              <SidebarSenseiIcon className="h-[18px] w-[18px]" />
+            </span>
+            <span>Talk to Sensei</span>
+          </button>
         </div>
 
-        <div className="flex items-center gap-2">
-          {isWorkspaceTab && (
-            <button
-              type="button"
-              onClick={handleToggleFaceDetection}
-              className={faceDetectionOn
-                ? 'group inline-flex items-center gap-2 rounded-full border border-indigo-300/60 bg-gradient-to-r from-indigo-600/80 to-blue-600/75 px-3 py-1.5 text-xs text-white shadow-[0_6px_18px_rgba(80,85,230,0.35)] transition-all hover:from-indigo-500 hover:to-blue-500'
-                : 'group inline-flex items-center gap-2 rounded-full border border-[#2d3659] bg-[#131a2c] px-3 py-1.5 text-xs text-slate-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all hover:border-indigo-400/50 hover:bg-[#17213a]'}
-              title={currentEmotion ? `Current emotion: ${currentEmotion}` : 'Focus Mode'}
-              data-last-reacted-emotion={lastReactedEmotion || ''}
-            >
-              <span className={faceDetectionOn
-                ? 'grid h-5 w-5 place-items-center rounded-full border border-white/25 bg-white/20'
-                : 'grid h-5 w-5 place-items-center rounded-full border border-slate-500/40 bg-slate-800/70'}
-              >
-                <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5" aria-hidden="true">
-                  <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h8A2.5 2.5 0 0 1 17 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-8A2.5 2.5 0 0 1 4 16.5v-9Z" stroke="currentColor" strokeWidth="1.8" />
-                  <path d="m17 9 3-1.7v9.4L17 15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
-
-              <span className="leading-none text-left">
-                <span className="block font-medium">Focus Mode</span>
-                <span className={faceDetectionOn ? 'block text-[10px] text-indigo-100/90' : 'block text-[10px] text-slate-400'}>
-                  {faceDetectionOn ? 'Camera active' : 'Enable camera'}
-                </span>
-              </span>
-
-              <span className={faceDetectionOn ? 'h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_8px_rgba(110,231,183,0.95)]' : 'h-2 w-2 rounded-full bg-slate-500'} />
-            </button>
-          )}
-
+        <div className="mt-auto border-t border-[#1C2333] p-3">
           <button
             type="button"
             onClick={handleLogout}
-            className="text-xs text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 rounded-lg px-3 py-1 transition-all"
+            className="w-full flex items-center gap-2.5 rounded-[10px] px-3 py-[9px] text-[13px] text-[#EF4444] hover:bg-[rgba(239,68,68,0.08)] transition-all"
           >
-            Logout
+            <span>
+              <SidebarLogoutIcon className="h-[18px] w-[18px]" />
+            </span>
+            <span>Logout</span>
+          </button>
+        </div>
+      </aside>
+
+      <header className="fixed top-0 left-0 md:left-[220px] right-0 h-[52px] bg-[rgba(8,11,20,0.85)] backdrop-blur-xl border-b border-[#1C2333] z-30 flex items-center justify-between px-4 md:px-7">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setMobileSidebarOpen(true)}
+            className="md:hidden rounded-lg border border-[#1C2333] bg-[#11172A] p-2 text-slate-300"
+            aria-label="Open navigation"
+          >
+            <SidebarMenuIcon />
+          </button>
+          <p className="text-[15px] font-semibold text-white">{pageTitle}</p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            className="relative text-[#4B5563] hover:text-white transition-colors"
+            aria-label="Notifications"
+          >
+            <TopBarBellIcon className="h-[18px] w-[18px]" />
+            {hasUnreadNotifications && (
+              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-[#EF4444]" />
+            )}
           </button>
 
-          <div className="rounded-full bg-[#161726] border border-[#2c2d42] px-3 py-1 text-sm text-gray-300">
+          <div className="rounded-full border border-[rgba(99,102,241,0.15)] bg-[rgba(99,102,241,0.1)] px-3.5 py-1 text-xs font-semibold text-[#6366F1]">
             {studentName}
           </div>
         </div>
       </header>
 
       {faceDetectionError && (
-        <div className="fixed top-16 right-6 z-40 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-1.5 text-xs text-rose-200">
+        <div className="fixed top-[60px] right-6 z-40 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-1.5 text-xs text-rose-200">
           {faceDetectionError}
         </div>
       )}
 
-      <div className="pt-14 h-[calc(100vh-56px)]">
-        {activeTab === 'home' && (
-          <HomeView
-            studentName={student.name}
-            sessions={sessions}
-            customEvents={customEvents}
-            documents={documents}
-            reviewStats={reviewStats}
-            workspaces={workspaces}
-            activeWorkspaceId={activeWorkspace?.id}
-            onOpenWorkspace={handleOpenWorkspace}
-            onCreateWorkspace={handleCreateWorkspace}
-            onDeleteWorkspace={handleDeleteWorkspace}
-          />
-        )}
+      <main className="h-screen pt-[52px] md:ml-[220px]">
+        <div className="h-[calc(100vh-52px)] overflow-hidden bg-[#080B14]">
+          {activeTab === 'home' && (
+            <HomeView
+              studentName={student.name}
+              sessions={sessions}
+              customEvents={customEvents}
+              documents={documents}
+              reviewStats={reviewStats}
+              workspaces={workspaces}
+              activeWorkspaceId={activeWorkspace?.id}
+              onOpenWorkspace={handleOpenWorkspace}
+              onCreateWorkspace={handleCreateWorkspace}
+              onDeleteWorkspace={handleDeleteWorkspace}
+            />
+          )}
 
-        {activeTab === 'organizations' && (
-          <OrganizationsView
-            studentName={studentName}
-          />
-        )}
+          {activeTab === 'organizations' && (
+            <OrganizationsView
+              studentName={studentName}
+            />
+          )}
 
-        {activeTab === 'workspace' && (
-          <WorkspaceView
-            workspaceName={activeWorkspace?.name}
-            activeTitle={activeTitle}
-            activeNotes={activeNotes}
-            onChat={handleChat}
-            chatMessages={chatMessages}
-            greeting={greeting}
-            documents={workspaceDocuments}
-            onGenerate={handleGenerate}
-            onSearchNotes={handleSearchNotes}
-            onUpload={handleUpload}
-            onDeleteDocument={handleDeleteDocument}
-            talkHistory={talkHistory}
-            onDeleteTalk={handleDeleteTalk}
-            onClearTalks={handleClearTalks}
-          />
-        )}
+          {activeTab === 'workspace' && (
+            <WorkspaceView
+              workspaceName={activeWorkspace?.name}
+              activeTitle={activeTitle}
+              activeNotes={activeNotes}
+              onChat={handleChat}
+              chatMessages={chatMessages}
+              greeting={greeting}
+              documents={workspaceDocuments}
+              onGenerate={handleGenerate}
+              onSearchNotes={handleSearchNotes}
+              onUpload={handleUpload}
+              onDeleteDocument={handleDeleteDocument}
+              talkHistory={talkHistory}
+              onDeleteTalk={handleDeleteTalk}
+              onClearTalks={handleClearTalks}
+            />
+          )}
 
-        {activeTab === 'library' && (
-          <LibraryView
-            documents={documents}
-            onUpload={handleUpload}
-            onGenerate={handleGenerate}
-            onOpenWorkspace={() => setActiveTab('workspace')}
-            onDeleteDocument={handleDeleteDocument}
-          />
-        )}
+          {activeTab === 'library' && (
+            <LibraryView
+              documents={documents}
+              onUpload={handleUpload}
+              onGenerate={handleGenerate}
+              onOpenWorkspace={handleSenseiNavigation}
+              onDeleteDocument={handleDeleteDocument}
+            />
+          )}
 
-        {activeTab === 'flashcards' && (
-          <FlashcardsView
-            flashcards={flashcards}
-            reviewStats={reviewStats}
-            onCreateCard={handleCreateFlashcard}
-            onGenerateAnswer={handleGenerateFlashcardAnswer}
-            onToggleMastered={handleToggleMastered}
-            onMarkReviewed={handleMarkReviewed}
-            onDeleteCard={handleDeleteFlashcard}
-          />
-        )}
+          {activeTab === 'flashcards' && (
+            <FlashcardsView
+              flashcards={flashcards}
+              reviewStats={reviewStats}
+              onCreateCard={handleCreateFlashcard}
+              onGenerateAnswer={handleGenerateFlashcardAnswer}
+              onToggleMastered={handleToggleMastered}
+              onMarkReviewed={handleMarkReviewed}
+              onDeleteCard={handleDeleteFlashcard}
+            />
+          )}
 
-        {activeTab === 'schedule' && (
-          <ScheduleView
-            sessions={sessions}
-            customEvents={customEvents}
-            onCreateEvent={handleCreateScheduleEvent}
-            onDeleteEvent={handleDeleteScheduleEvent}
-          />
-        )}
-      </div>
+          {activeTab === 'schedule' && (
+            <ScheduleView
+              sessions={sessions}
+              customEvents={customEvents}
+              onCreateEvent={handleCreateScheduleEvent}
+              onDeleteEvent={handleDeleteScheduleEvent}
+            />
+          )}
+        </div>
+      </main>
 
       {isWorkspaceTab && faceDetectionOn && (
         <FaceDetectionPip
@@ -950,6 +1209,7 @@ export default function MainApp() {
           studentId={student.id}
           onResult={handleVoiceResult}
           speakText={speakText}
+          onScheduleCreated={handleVoiceScheduleCreated}
         />
       )}
     </div>

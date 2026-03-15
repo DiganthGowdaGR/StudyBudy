@@ -49,6 +49,10 @@ export default function TeacherHome() {
   const [session, setSession] = useState(() => getTeacherSession())
   const [activeTab, setActiveTab] = useState('dashboard')
 
+  useEffect(() => {
+    document.title = 'StudyBuddy — Teacher Portal'
+  }, [])
+
   /* shared state */
   const [exams, setExams] = useState([])
   const [students, setStudents] = useState([])
@@ -480,7 +484,12 @@ export default function TeacherHome() {
                 <div>
                   <h2 className="text-lg font-semibold mb-4">Enrolled Students</h2>
                   {students.length === 0 ? (
-                    <p className="text-sm text-slate-500">No students enrolled yet.</p>
+                    <div className="rounded-xl border border-dashed border-[#394061] bg-[#0c1020] p-8 text-center">
+                      <p className="text-4xl" aria-hidden="true">👥</p>
+                      <p className="mt-3 text-lg font-semibold text-white">No students enrolled</p>
+                      <p className="mt-2 text-sm text-slate-400">Students can join using the subject code:</p>
+                      <p className="mt-3 inline-flex rounded-lg border border-indigo-500/40 bg-indigo-500/15 px-3 py-1 text-sm font-semibold tracking-widest text-indigo-200">{activeSubject?.subject_code || 'CLOU-2881'}</p>
+                    </div>
                   ) : (
                     <div className="space-y-2">
                       {students.map((s) => (
@@ -504,7 +513,11 @@ export default function TeacherHome() {
                     <button onClick={() => { setExamView('create'); setCreateStep(1); setExamForm({ title: '', description: '', exam_type: 'mcq', duration_mins: 60, total_marks: 100, closes_at: '' }); setCreatedExamId(null); setExamQuestions([]) }} className="rounded-lg bg-indigo-600 px-3 py-2 text-xs text-white hover:bg-indigo-500">+ Create Exam</button>
                   </div>
                   {exams.length === 0 ? (
-                    <p className="py-8 text-center text-slate-500">No exams created yet.</p>
+                    <div className="py-8 text-center">
+                      <p className="text-4xl" aria-hidden="true">📋</p>
+                      <p className="mt-3 text-lg font-semibold text-white">No exams scheduled</p>
+                      <p className="mt-2 text-sm text-slate-500">When you publish an exam it will appear here.</p>
+                    </div>
                   ) : (
                     <div className="space-y-3">
                       {exams.map((ex) => (
@@ -712,7 +725,11 @@ export default function TeacherHome() {
                   <p className="text-xs text-slate-400 mb-4">{selectedExam.exam_type?.toUpperCase()} · {selectedExam.total_marks} marks</p>
 
                   {submissions.length === 0 ? (
-                    <p className="py-8 text-center text-slate-500">No submissions yet.</p>
+                    <div className="py-8 text-center">
+                      <p className="text-4xl" aria-hidden="true">📭</p>
+                      <p className="mt-3 text-lg font-semibold text-white">No submissions yet</p>
+                      <p className="mt-2 text-sm text-slate-500">Students haven&apos;t attempted this exam yet.</p>
+                    </div>
                   ) : (
                     <div className="rounded-xl border border-[#272d47] bg-[#101426] overflow-hidden">
                       <table className="w-full text-sm">
@@ -862,7 +879,11 @@ export default function TeacherHome() {
                     </div>
                   </div>
                   {announcements.length === 0 ? (
-                    <p className="text-sm text-slate-500">No announcements yet.</p>
+                    <div className="rounded-xl border border-dashed border-[#394061] bg-[#0c1020] p-6 text-center">
+                      <p className="text-4xl" aria-hidden="true">📢</p>
+                      <p className="mt-3 text-lg font-semibold text-white">All quiet here</p>
+                      <p className="mt-2 text-sm text-slate-500">You haven&apos;t posted anything yet. Check back soon.</p>
+                    </div>
                   ) : (
                     <div className="space-y-2">
                       {announcements.map((a) => (

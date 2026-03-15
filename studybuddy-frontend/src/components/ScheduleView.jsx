@@ -5,6 +5,7 @@ const TIMELINE_START_MINUTES = 8 * 60
 const TIMELINE_END_MINUTES = 22 * 60
 const TIMELINE_INTERVAL_MINUTES = 120
 const TIMELINE_HEIGHT_PX = 500
+const TIMELINE_PIXELS_PER_MINUTE = TIMELINE_HEIGHT_PX / (TIMELINE_END_MINUTES - TIMELINE_START_MINUTES)
 
 function PlusIcon({ className = 'h-4 w-4' }) {
   return (
@@ -38,7 +39,7 @@ function addDays(date, days) {
 }
 
 function formatDateKey(date) {
-  return date.toISOString().slice(0, 10)
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
 function formatWeekRange(startDate) {
@@ -125,28 +126,22 @@ function sortEvents(a, b) {
   return a.startTime.localeCompare(b.startTime)
 }
 
-function getCompactEventHeight(durationMins) {
-  if (durationMins >= 360) return 94
-  if (durationMins >= 240) return 84
-  if (durationMins >= 120) return 74
-  if (durationMins >= 60) return 64
-  return 56
-}
-
 function getTimelineLayout(event) {
   const startMinutes = toMinutes(event.startTime)
   if (startMinutes === null) return null
 
-  const totalRange = TIMELINE_END_MINUTES - TIMELINE_START_MINUTES
-  if (totalRange <= 0) return null
+  const duration = Number(event.durationMins || calculateDuration(event.startTime, event.endTime) || 0)
+  if (duration <= 0) return null
 
-  const clippedStart = Math.min(Math.max(startMinutes, TIMELINE_START_MINUTES), TIMELINE_END_MINUTES)
-  if (clippedStart >= TIMELINE_END_MINUTES) return null
+  const endMinutes = startMinutes + duration
+  const visibleStart = Math.min(Math.max(startMinutes, TIMELINE_START_MINUTES), TIMELINE_END_MINUTES)
+  const visibleEnd = Math.min(Math.max(endMinutes, TIMELINE_START_MINUTES), TIMELINE_END_MINUTES)
+  const visibleDuration = visibleEnd - visibleStart
+  if (visibleDuration <= 0) return null
 
-  const topPercent = ((clippedStart - TIMELINE_START_MINUTES) / totalRange) * 100
-  const rawTopPx = (topPercent / 100) * TIMELINE_HEIGHT_PX
-  const heightPx = getCompactEventHeight(event.durationMins || 45)
-  const maxTop = Math.max(0, TIMELINE_HEIGHT_PX - heightPx - 6)
+  const rawTopPx = (visibleStart - TIMELINE_START_MINUTES) * TIMELINE_PIXELS_PER_MINUTE
+  const heightPx = Math.max(10, visibleDuration * TIMELINE_PIXELS_PER_MINUTE - 2)
+  const maxTop = Math.max(0, TIMELINE_HEIGHT_PX - heightPx - 1)
   const topPx = Math.min(rawTopPx, maxTop)
 
   return { topPx, heightPx }
@@ -346,13 +341,13 @@ export default function ScheduleView({ sessions, customEvents, onCreateEvent, on
   }
 
   return (
-    <div className="h-full bg-[#090b14]">
+    <div className="h-full bg-gradient-to-br from-[#070912] via-[#080c18] to-[#0b1224] text-slate-200">
       <div className="h-full flex flex-col lg:flex-row">
-        <aside className="lg:w-[320px] border-b lg:border-b-0 lg:border-r border-[#1c1f31] bg-[#0e101b] p-4 sm:p-5 space-y-4 overflow-y-auto">
-          <section className="rounded-2xl border border-[#25283d] bg-[#131627] p-5">
+        <aside className="lg:w-[320px] border-b lg:border-b-0 lg:border-r border-[#151c32] bg-[#080d1a]/70 backdrop-blur p-4 sm:p-5 space-y-4 overflow-y-auto shadow-[inset_-1px_0_0_rgba(99,102,241,0.08)]">
+          <section className="rounded-2xl border border-[#151c32] bg-gradient-to-b from-[#0e1429] to-[#0b1121] p-5 shadow-[0_16px_40px_rgba(0,0,0,0.35)]">
             <div className="flex items-center justify-between">
-              <p className="text-[11px] text-gray-500 uppercase tracking-[0.18em]">Daily Goals</p>
-              <span className="text-indigo-400 text-xs">Focus</span>
+              <p className="text-[11px] text-slate-400 uppercase tracking-[0.18em]">Daily Goals</p>
+              <span className="text-indigo-300 text-xs">Focus</span>
             </div>
 
             <div className="mt-4 flex justify-center">
@@ -366,27 +361,27 @@ export default function ScheduleView({ sessions, customEvents, onCreateEvent, on
               />
             </div>
 
-            <p className="mt-3 text-sm text-gray-300 text-center">{focusScore}% focus score</p>
+            <p className="mt-3 text-sm text-slate-200 text-center">{focusScore}% focus score</p>
 
             <div className="mt-4 space-y-2 text-sm">
-              <p className="text-gray-300"><span className="text-indigo-400">●</span> {Math.round((weekMinutes / 60) * 10) / 10}h scheduled this week</p>
-              <p className="text-gray-300"><span className="text-cyan-400">●</span> {weeklyBlockCount} active study blocks</p>
-              <p className="text-gray-300"><span className="text-rose-400">●</span> {highPriorityCount} high-priority deadlines</p>
+              <p className="text-slate-200"><span className="text-indigo-400">●</span> {Math.round((weekMinutes / 60) * 10) / 10}h scheduled this week</p>
+              <p className="text-slate-200"><span className="text-cyan-400">●</span> {weeklyBlockCount} active study blocks</p>
+              <p className="text-slate-200"><span className="text-rose-400">●</span> {highPriorityCount} high-priority deadlines</p>
             </div>
           </section>
 
-          <section className="rounded-2xl border border-[#25283d] bg-[#131627] p-5">
-            <p className="text-[11px] text-gray-500 uppercase tracking-[0.18em]">Upcoming Deadlines</p>
+          <section className="rounded-2xl border border-[#151c32] bg-gradient-to-b from-[#0e1429] to-[#0b1121] p-5 shadow-[0_16px_40px_rgba(0,0,0,0.35)]">
+            <p className="text-[11px] text-slate-400 uppercase tracking-[0.18em]">Upcoming Deadlines</p>
             <div className="mt-3 space-y-2">
               {upcomingDeadlines.length > 0 ? (
                 upcomingDeadlines.map((event) => (
                   <div
                     key={event.id}
-                    className={`rounded-xl border p-3 ${event.priority === 'high' ? 'bg-rose-500/12 border-rose-400/35' : 'bg-[#1a1e33] border-[#2f3450]'}`}
+                    className={`rounded-xl border p-3 ${event.priority === 'high' ? 'bg-rose-500/12 border-rose-400/35' : 'bg-[#0f1426] border-[#1f2744]'}`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-xs text-gray-400">{formatAgendaDate(event.date)} • {event.startTime}</p>
+                        <p className="text-xs text-slate-400">{formatAgendaDate(event.date)} • {event.startTime}</p>
                         <p className="mt-1 text-sm text-white font-medium leading-snug">{event.title}</p>
                       </div>
                       <button
@@ -401,7 +396,7 @@ export default function ScheduleView({ sessions, customEvents, onCreateEvent, on
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-gray-500 text-center py-2">No upcoming deadlines yet</p>
+                <p className="text-xs text-slate-500 text-center py-2">No upcoming deadlines yet</p>
               )}
             </div>
           </section>
@@ -415,18 +410,18 @@ export default function ScheduleView({ sessions, customEvents, onCreateEvent, on
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="rounded-xl border border-[#2c3150] bg-[#151a2d] p-1 flex">
+              <div className="rounded-xl border border-[#1f2744] bg-[#0f1426] p-1 flex shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
                 <button
                   type="button"
                   onClick={() => setViewMode('weekly')}
-                  className={`px-4 py-2 rounded-lg text-sm ${viewMode === 'weekly' ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-white'}`}
+                  className={`px-4 py-2 rounded-lg text-sm ${viewMode === 'weekly' ? 'bg-indigo-600 text-white shadow-[0_10px_24px_rgba(99,102,241,0.35)]' : 'text-slate-400 hover:text-white'}`}
                 >
                   Weekly
                 </button>
                 <button
                   type="button"
                   onClick={() => setViewMode('monthly')}
-                  className={`px-4 py-2 rounded-lg text-sm ${viewMode === 'monthly' ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-white'}`}
+                  className={`px-4 py-2 rounded-lg text-sm ${viewMode === 'monthly' ? 'bg-indigo-600 text-white shadow-[0_10px_24px_rgba(99,102,241,0.35)]' : 'text-slate-400 hover:text-white'}`}
                 >
                   Monthly
                 </button>
@@ -438,7 +433,7 @@ export default function ScheduleView({ sessions, customEvents, onCreateEvent, on
                   setShowEventForm((prev) => !prev)
                   setEventError('')
                 }}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium shadow-[0_14px_32px_rgba(99,102,241,0.25)]"
               >
                 <PlusIcon className="h-4 w-4" />
                 Schedule Event
@@ -447,25 +442,25 @@ export default function ScheduleView({ sessions, customEvents, onCreateEvent, on
           </div>
 
           {showEventForm && (
-            <form onSubmit={handleSubmitEvent} className="mt-5 rounded-2xl border border-[#2a2f49] bg-[#121626] p-4 sm:p-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <form onSubmit={handleSubmitEvent} className="mt-5 rounded-2xl border border-[#1f2744] bg-gradient-to-r from-[#0e1426] via-[#0f172a] to-[#0c1223] p-4 sm:p-5 grid grid-cols-1 md:grid-cols-3 gap-3 shadow-[0_16px_40px_rgba(0,0,0,0.35)]">
               <input
                 type="text"
                 value={eventForm.title}
                 onChange={(e) => setEventForm((prev) => ({ ...prev, title: e.target.value }))}
                 placeholder="Event title"
-                className="bg-[#1a1f34] border border-[#2b3150] rounded-lg px-3 py-2.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="bg-[#0f1426] border border-[#1f2744] rounded-lg px-3 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <input
                 type="text"
                 value={eventForm.subject}
                 onChange={(e) => setEventForm((prev) => ({ ...prev, subject: e.target.value }))}
                 placeholder="Subject"
-                className="bg-[#1a1f34] border border-[#2b3150] rounded-lg px-3 py-2.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="bg-[#0f1426] border border-[#1f2744] rounded-lg px-3 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <select
                 value={eventForm.priority}
                 onChange={(e) => setEventForm((prev) => ({ ...prev, priority: e.target.value }))}
-                className="bg-[#1a1f34] border border-[#2b3150] rounded-lg px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="bg-[#0f1426] border border-[#1f2744] rounded-lg px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="normal">Normal Priority</option>
                 <option value="high">High Priority</option>
@@ -475,29 +470,29 @@ export default function ScheduleView({ sessions, customEvents, onCreateEvent, on
                 type="date"
                 value={eventForm.date}
                 onChange={(e) => setEventForm((prev) => ({ ...prev, date: e.target.value }))}
-                className="bg-[#1a1f34] border border-[#2b3150] rounded-lg px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="bg-[#0f1426] border border-[#1f2744] rounded-lg px-3 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <input
                 type="time"
                 value={eventForm.startTime}
                 onChange={(e) => setEventForm((prev) => ({ ...prev, startTime: e.target.value }))}
-                className="bg-[#1a1f34] border border-[#2b3150] rounded-lg px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="bg-[#0f1426] border border-[#1f2744] rounded-lg px-3 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <input
                 type="time"
                 value={eventForm.endTime}
                 onChange={(e) => setEventForm((prev) => ({ ...prev, endTime: e.target.value }))}
-                className="bg-[#1a1f34] border border-[#2b3150] rounded-lg px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="bg-[#0f1426] border border-[#1f2744] rounded-lg px-3 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
 
-              <p className="md:col-span-3 text-[11px] text-gray-500">
+              <p className="md:col-span-3 text-[11px] text-slate-400">
                 If end time is earlier than start time, the block is treated as overnight.
               </p>
 
               <div className="md:col-span-3 flex items-center justify-end">
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm"
+                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm shadow-[0_12px_24px_rgba(99,102,241,0.25)]"
                 >
                   Save Event
                 </button>
@@ -510,34 +505,80 @@ export default function ScheduleView({ sessions, customEvents, onCreateEvent, on
           )}
 
           {viewMode === 'weekly' ? (
-            <section className="mt-5 rounded-2xl border border-[#1f253f] bg-[#0f1323] p-4 sm:p-5 overflow-hidden">
+            <section className="mt-5 rounded-2xl border border-[#151c32] bg-gradient-to-b from-[#0c1122] to-[#0a0f1e] p-4 sm:p-5 overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.35)]">
               <div className="overflow-x-auto">
-                <div className="min-w-[820px]">
-                  <div className="grid grid-cols-5 border-b border-[#222843] pb-3">
+                <div className="min-w-[820px] space-y-5">
+                  <div className="grid grid-cols-5 border-b border-[#1a2038] pb-3">
                     {boardDays.map((day) => {
                       const dayKey = formatDateKey(day)
                       const isToday = dayKey === todayKey
 
                       return (
                         <div key={dayKey} className="px-3 text-center">
-                          <p className="text-[11px] uppercase tracking-[0.18em] text-gray-500">{formatDayName(day)}</p>
-                          <p className={`mt-1 text-3xl font-semibold ${isToday ? 'text-indigo-400' : 'text-white'}`}>{formatDayNumber(day)}</p>
+                          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{formatDayName(day)}</p>
+                          <p className={`mt-1 text-3xl font-semibold ${isToday ? 'text-indigo-300' : 'text-white'}`}>{formatDayNumber(day)}</p>
                         </div>
                       )
                     })}
                   </div>
 
-                  <div className="mt-2 grid grid-cols-5" style={{ height: `${TIMELINE_HEIGHT_PX}px` }}>
+                  <div className="grid grid-cols-5 gap-3">
+                    {boardDays.map((day) => {
+                      const dayKey = formatDateKey(day)
+                      const dayEvents = eventsByDate.get(dayKey) || []
+
+                      return (
+                        <div key={dayKey} className="rounded-xl border border-[#1a2038] bg-[#0f1426] p-3 min-h-[120px] shadow-[0_10px_26px_rgba(0,0,0,0.35)]">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-semibold text-white">{dayEvents.length} events</p>
+                            <span className={`rounded-md px-2 py-1 text-[11px] uppercase tracking-wider ${dayKey === todayKey ? 'bg-indigo-500/20 text-indigo-200 border border-indigo-500/60' : 'bg-[#0d1226] text-slate-300 border border-[#1f2744]'}`}>
+                              {dayKey === todayKey ? 'Today' : 'Day'}
+                            </span>
+                          </div>
+
+                          <div className="mt-2 space-y-2">
+                            {dayEvents.length === 0 ? (
+                              <p className="text-xs text-slate-500">No events scheduled.</p>
+                            ) : (
+                              dayEvents.map((event) => (
+                                <div
+                                  key={event.id}
+                                  className={`rounded-lg border px-2.5 py-2 ${getEventToneClass(event)} shadow-[0_8px_18px_rgba(0,0,0,0.35)]`}
+                                >
+                                  <div className="flex items-center justify-between gap-2">
+                                    <p className="text-xs text-gray-200">{event.startTime} - {event.endTime}</p>
+                                    {!event.aiSuggested && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteEvent(event)}
+                                        className="text-[10px] rounded-md bg-black/20 hover:bg-black/40 text-gray-200 px-2 py-0.5"
+                                        aria-label="Delete event"
+                                      >
+                                        Delete
+                                      </button>
+                                    )}
+                                  </div>
+                                  <p className="mt-1 text-sm text-white font-medium leading-snug">{event.title}</p>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  <div className="grid grid-cols-5" style={{ height: `${TIMELINE_HEIGHT_PX}px` }}>
                     {boardDays.map((day) => {
                       const key = formatDateKey(day)
                       const dayEvents = eventsByDate.get(key) || []
 
                       return (
-                        <div key={key} className="relative border-r last:border-r-0 border-[#232945] px-2">
+                        <div key={key} className="relative border-r last:border-r-0 border-[#1a2038] px-2">
                           {timeMarks.map((mark) => (
                             <div
                               key={`${key}-${mark.minute}`}
-                              className="absolute left-0 right-0 border-t border-[#1b2038]"
+                              className="absolute left-0 right-0 border-t border-[#11172c]"
                               style={{ top: `${mark.topPercent}%` }}
                             />
                           ))}
@@ -587,21 +628,21 @@ export default function ScheduleView({ sessions, customEvents, onCreateEvent, on
               </div>
             </section>
           ) : (
-            <section className="mt-5 rounded-2xl border border-[#1f253f] bg-[#0f1323] p-4 sm:p-5">
+            <section className="mt-5 rounded-2xl border border-[#151c32] bg-gradient-to-b from-[#0c1122] to-[#0a0f1e] p-4 sm:p-5 shadow-[0_16px_40px_rgba(0,0,0,0.35)]">
               <div className="space-y-3">
                 {monthAgenda.length > 0 ? (
                   monthAgenda.map((day) => (
-                    <div key={day.date} className="rounded-xl border border-[#2a3152] bg-[#141a2d] p-3">
+                    <div key={day.date} className="rounded-xl border border-[#1a2038] bg-[#0f1426] p-3 shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
                       <div className="flex items-center justify-between gap-3">
                         <p className="text-sm font-semibold text-white">{formatAgendaDate(day.date)}</p>
-                        <p className="text-xs text-gray-500">{day.events.length} events</p>
+                        <p className="text-xs text-slate-500">{day.events.length} events</p>
                       </div>
 
                       <div className="mt-2 space-y-2">
                         {day.events.map((event) => (
-                          <div key={event.id} className="rounded-lg border border-[#30385d] bg-[#19203a] px-3 py-2 flex items-center justify-between gap-3">
+                          <div key={event.id} className="rounded-lg border border-[#1f2744] bg-[#0d1226] px-3 py-2 flex items-center justify-between gap-3">
                             <div>
-                              <p className="text-xs text-gray-400">{event.startTime} - {event.endTime}</p>
+                              <p className="text-xs text-slate-400">{event.startTime} - {event.endTime}</p>
                               <p className="text-sm text-white font-medium">{event.title}</p>
                             </div>
                             <div className="flex items-center gap-2">
@@ -612,7 +653,7 @@ export default function ScheduleView({ sessions, customEvents, onCreateEvent, on
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteEvent(event)}
-                                  className="text-[10px] rounded-md bg-[#3a1e2a] hover:bg-rose-600 text-rose-100 px-2 py-1"
+                                  className="text-[10px] rounded-md bg-[#2d1020] hover:bg-rose-600 text-rose-100 px-2 py-1"
                                 >
                                   Delete
                                 </button>
@@ -624,11 +665,12 @@ export default function ScheduleView({ sessions, customEvents, onCreateEvent, on
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-center py-6">No events yet. Schedule your first study block.</p>
+                  <p className="text-slate-500 text-center py-6">No events yet. Schedule your first study block.</p>
                 )}
               </div>
             </section>
           )}
+
         </main>
       </div>
     </div>

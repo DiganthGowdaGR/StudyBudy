@@ -1,4 +1,27 @@
 import React, { useMemo, useState } from 'react'
+import StudyHeatmap from './StudyHeatmap'
+
+function getGreeting(name) {
+  const hour = new Date().getHours()
+  if (hour >= 5 && hour < 12) return `Good morning, ${name} ☀️`
+  if (hour >= 12 && hour < 17) return `Good afternoon, ${name} 👋`
+  if (hour >= 17 && hour < 21) return `Good evening, ${name} 🌙`
+  return `Studying late, ${name}? 🌟`
+}
+
+function getDailyQuote() {
+  const quotes = [
+    'Every expert was once a beginner.',
+    'Progress, not perfection.',
+    'One more page. One more concept.',
+    'Your future self is watching.',
+    'Consistency beats intensity.',
+    'Small steps every day.',
+    'The best time to study is now.'
+  ]
+
+  return quotes[new Date().getDay()]
+}
 
 function TrashIcon({ className = 'h-4 w-4' }) {
   return (
@@ -119,6 +142,9 @@ export default function HomeView({
 }) {
   const [workspaceName, setWorkspaceName] = useState('')
   const [workspaceError, setWorkspaceError] = useState('')
+  const displayName = (studentName || 'Student').trim()
+  const heroGreeting = getGreeting(displayName)
+  const dailyQuote = getDailyQuote()
 
   const studySeries = useMemo(
     () => buildStudySeries(sessions, customEvents, reviewStats.history, 7),
@@ -128,12 +154,42 @@ export default function HomeView({
   const totalMinutes = studySeries.reduce((sum, item) => sum + item.minutes, 0)
   const activeStudyDays = studySeries.filter((item) => item.minutes > 0).length
   const avgMinsPerStudyDay = activeStudyDays > 0 ? Math.round(totalMinutes / activeStudyDays) : 0
-  const maxMinutes = Math.max(...studySeries.map((item) => item.minutes), 60)
   const trackedSessions = sessions.length > 0
     ? sessions.length
     : customEvents.length > 0
       ? customEvents.length
       : activeStudyDays
+
+  const statCards = [
+    {
+      label: 'STUDY DAYS',
+      value: activeStudyDays,
+      desc: 'Active in last 7 days',
+      icon: '📅',
+      accent: 'bg-[rgba(59,130,246,0.1)] border border-[rgba(59,130,246,0.25)] text-[#3B82F6]',
+    },
+    {
+      label: 'AVERAGE',
+      value: `${avgMinsPerStudyDay}m`,
+      desc: 'Per active study day',
+      icon: '⏱',
+      accent: 'bg-[rgba(139,92,246,0.1)] border border-[rgba(139,92,246,0.25)] text-[#8B5CF6]',
+    },
+    {
+      label: 'SESSIONS',
+      value: trackedSessions,
+      desc: 'Recent tracked sessions',
+      icon: '🔄',
+      accent: 'bg-[rgba(99,102,241,0.12)] border border-[rgba(99,102,241,0.25)] text-[#6366F1]',
+    },
+    {
+      label: 'RESOURCES',
+      value: documents.length,
+      desc: 'Uploaded study files',
+      icon: '📁',
+      accent: 'bg-[rgba(16,185,129,0.12)] border border-[rgba(16,185,129,0.28)] text-[#10B981]',
+    },
+  ]
 
   const handleCreateWorkspace = async () => {
     const name = workspaceName.trim()
@@ -161,74 +217,56 @@ export default function HomeView({
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-[#090b13] p-6 pb-24 space-y-6">
-      <section className="rounded-2xl border border-[#242842] bg-[linear-gradient(135deg,rgba(30,35,58,0.95),rgba(17,20,35,0.92))] p-6">
-        <p className="text-xs uppercase tracking-[0.22em] text-indigo-300">Home</p>
-        <h2 className="mt-2 text-4xl font-semibold text-white">Welcome back, {studentName || 'Student'}</h2>
-        <p className="mt-2 text-sm text-gray-400">Track your study flow and jump into your workspace when ready.</p>
+    <div className="h-full overflow-y-auto bg-[#080B14] p-6 pb-24 space-y-8 text-[#94A3B8]">
+      <section className="rounded-2xl border border-[#1C2333] bg-gradient-to-b from-[rgba(99,102,241,0.05)] to-transparent p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+        <div className="flex flex-col gap-3">
+          <span className="sb-badge" style={{ background: 'rgba(99,102,241,0.1)', color: '#6366F1', borderColor: 'rgba(99,102,241,0.2)' }}>HOME</span>
+          <h2 className="text-4xl font-bold text-white">{heroGreeting}</h2>
+          <p className="text-sm text-[#4B5563]">Track your study flow and jump into your workspace.</p>
+          <p className="text-sm italic text-[#374151] border-l-2 border-[#1C2333] pl-3">{dailyQuote}</p>
+        </div>
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        <article className="rounded-xl border border-[#252a44] bg-[#111526] p-4">
-          <p className="text-xs uppercase tracking-widest text-gray-500">Study Days</p>
-          <p className="mt-2 text-3xl font-semibold text-white">{activeStudyDays}</p>
-          <p className="text-xs text-gray-400 mt-1">Active in the last 7 days</p>
-        </article>
-
-        <article className="rounded-xl border border-[#252a44] bg-[#111526] p-4">
-          <p className="text-xs uppercase tracking-widest text-gray-500">Average</p>
-          <p className="mt-2 text-3xl font-semibold text-white">{avgMinsPerStudyDay}m</p>
-          <p className="text-xs text-gray-400 mt-1">Per active study day</p>
-        </article>
-
-        <article className="rounded-xl border border-[#252a44] bg-[#111526] p-4">
-          <p className="text-xs uppercase tracking-widest text-gray-500">Sessions</p>
-          <p className="mt-2 text-3xl font-semibold text-white">{trackedSessions}</p>
-          <p className="text-xs text-gray-400 mt-1">Recent tracked sessions</p>
-        </article>
-
-        <article className="rounded-xl border border-[#252a44] bg-[#111526] p-4">
-          <p className="text-xs uppercase tracking-widest text-gray-500">Resources</p>
-          <p className="mt-2 text-3xl font-semibold text-white">{documents.length}</p>
-          <p className="text-xs text-gray-400 mt-1">Uploaded study files</p>
-        </article>
+        {statCards.map((card) => (
+          <article key={card.label} className="sb-card">
+            <div className="flex items-start justify-between">
+              <div className="text-[11px] uppercase tracking-[0.12em] text-[#4B5563]">{card.label}</div>
+              <span className={`h-10 w-10 ${card.accent} rounded-xl grid place-items-center text-lg shadow-[0_0_20px_rgba(99,102,241,0.1)]`} aria-hidden="true">{card.icon}</span>
+            </div>
+            <p className="mt-3 text-3xl font-bold text-white">{card.value}</p>
+            <p className="text-xs text-[#4B5563] mt-1">{card.desc}</p>
+          </article>
+        ))}
       </section>
 
-      <section className="rounded-2xl border border-[#252a44] bg-[#101425] p-5">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-lg font-semibold text-white">Weekly Study Graph</p>
-            <p className="text-xs text-gray-400">Minutes studied each day</p>
-          </div>
-          <p className="text-xs text-indigo-300 uppercase tracking-widest">Streak {reviewStats.streakDays}d</p>
-        </div>
-
-        <div className="mt-5 grid grid-cols-7 gap-2 items-end h-44">
-          {studySeries.map((item) => {
-            const height = Math.max(8, Math.round((item.minutes / maxMinutes) * 100))
-            return (
-              <div key={item.key} className="flex flex-col items-center gap-2">
-                <div className="w-full h-28 rounded-lg border border-[#20253a] bg-[#0f1220] flex items-end p-1.5">
-                  <div
-                    className="w-full rounded-md bg-gradient-to-t from-[#38bdf8] via-[#8b5cf6] to-[#f0abfc]"
-                    style={{ height: `${height}%` }}
-                    title={`${item.minutes} minutes`}
-                  />
-                </div>
-                <p className="text-[10px] text-gray-500">{item.label}</p>
-                <p className="text-[10px] text-gray-600">{item.shortDate}</p>
-              </div>
-            )
-          })}
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-[#252a44] bg-[#101425] p-5">
+      <section className="sb-card">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-lg font-semibold text-white">My Workspaces</p>
-            <p className="text-xs text-gray-400">Create workspace cards and open them from here.</p>
+            <p className="sb-title-md">Study Activity</p>
+            <p className="text-xs text-[#4B5563]">Last 6 months • weekly heatmap</p>
           </div>
+          <span className="sb-badge warning">Streak {reviewStats.streakDays}d</span>
+        </div>
+
+        <div className="mt-5">
+          <StudyHeatmap studentId={localStorage.getItem('student_id')} />
+        </div>
+      </section>
+
+      <section className="sb-card">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="sb-title-md">My Workspaces</p>
+            <p className="text-xs text-[#4B5563]">Create workspace cards and open from here</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleCreateWorkspace}
+            className="sb-btn-primary text-sm px-4 py-2"
+          >
+            + New Workspace
+          </button>
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -242,14 +280,14 @@ export default function HomeView({
                 handleCreateWorkspace()
               }
             }}
-            placeholder="Create new workspace"
-            className="w-full md:w-72 rounded-xl border border-[#2d3350] bg-[#161a2c] px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Workspace name"
+            className="sb-input w-full md:w-72"
           />
 
           <button
             type="button"
             onClick={handleCreateWorkspace}
-            className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2"
+            className="sb-btn-secondary text-sm px-4 py-2"
           >
             Create
           </button>
@@ -257,52 +295,58 @@ export default function HomeView({
 
         {workspaceError && <p className="mt-2 text-xs text-red-400">{workspaceError}</p>}
 
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-          {workspaces.map((workspace) => {
-            const isActive = workspace.id === activeWorkspaceId
-            return (
-              <article
-                key={workspace.id}
-                className={`rounded-xl border p-4 ${
-                  isActive
-                    ? 'border-indigo-500/70 bg-[#1b2040]'
-                    : 'border-[#2a2f47] bg-[#14182b]'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-semibold text-white">{workspace.name}</p>
-                    <p className="text-[11px] text-gray-500 mt-1">Workspace ready</p>
+        {workspaces.length === 0 ? (
+          <div className="mt-4 rounded-xl border border-dashed border-[#1C2333] bg-[#0D1117] px-6 py-10 text-center">
+            <p className="text-sm text-[#4B5563]">No workspaces yet</p>
+          </div>
+        ) : (
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+            {workspaces.map((workspace) => {
+              const isActive = workspace.id === activeWorkspaceId
+              return (
+                <article
+                  key={workspace.id}
+                  className={`rounded-xl border p-4 transition-all ${
+                    isActive
+                      ? 'border-[#6366F1] bg-[#0F1324] shadow-[0_0_25px_rgba(99,102,241,0.18)]'
+                      : 'border-[#1C2333] bg-[#0D1117] hover:border-[#6366F1]/70 hover:-translate-y-0.5'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold text-white">{workspace.name}</p>
+                      <p className="text-[11px] text-[#4B5563] mt-1">Workspace ready</p>
+                    </div>
+                    {isActive && (
+                      <span className="sb-badge" style={{ background: 'rgba(99,102,241,0.1)', color: '#6366F1', borderColor: 'rgba(99,102,241,0.2)' }}>Active</span>
+                    )}
                   </div>
-                  {isActive && (
-                    <span className="text-[10px] uppercase tracking-wider text-indigo-300">Active</span>
-                  )}
-                </div>
 
-                <div className="mt-3 flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => onOpenWorkspace(workspace.id)}
-                    className="flex-1 rounded-lg border border-[#333a5a] bg-[#1a1f37] hover:bg-indigo-600 text-gray-200 hover:text-white text-sm py-2 transition-all"
-                  >
-                    Open
-                  </button>
+                  <div className="mt-3 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onOpenWorkspace(workspace.id)}
+                      className="flex-1 rounded-lg border border-[#1C2333] bg-[#161B27] text-white text-sm py-2 hover:border-[#6366F1] hover:shadow-[0_0_20px_rgba(99,102,241,0.15)] transition-all"
+                    >
+                      Open
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteWorkspace(workspace.id)}
-                    disabled={workspaces.length <= 1}
-                    title="Delete workspace"
-                    aria-label="Delete workspace"
-                    className="rounded-lg bg-[#3a1e2a] hover:bg-red-600 text-red-100 p-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <TrashIcon className="h-4 w-4" />
-                  </button>
-                </div>
-              </article>
-            )
-          })}
-        </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteWorkspace(workspace.id)}
+                      disabled={workspaces.length <= 1}
+                      title="Delete workspace"
+                      aria-label="Delete workspace"
+                      className="rounded-lg bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.3)] text-[#EF4444] p-2.5 transition-all hover:bg-[rgba(239,68,68,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+        )}
       </section>
     </div>
   )

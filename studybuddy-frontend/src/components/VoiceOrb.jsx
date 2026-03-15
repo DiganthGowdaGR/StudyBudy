@@ -3,6 +3,7 @@ import { api } from '../services/api'
 import { voiceKeywords } from '../utils/voiceKeywords'
 
 const MAX_RECORD_MS = 4500
+const MIN_TTS_GAP_MS = 1800
 
 function normalizeTime(value, fallback) {
   const raw = String(value || '').trim().toLowerCase().replace(/\./g, '')
@@ -116,8 +117,34 @@ function SpeakerIcon({ className }) {
   )
 }
 
+function speakWithBrowserTTS(text, onDone) {
+  if (typeof window === 'undefined' || !window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined') {
+    return false
+  }
+
+  const utterance = new SpeechSynthesisUtterance(text)
+  utterance.rate = 1
+  utterance.pitch = 1
+  utterance.onend = () => onDone?.()
+  utterance.onerror = () => onDone?.()
+
+  window.speechSynthesis.cancel()
+  window.speechSynthesis.speak(utterance)
+  return true
+}
+
+function parseRetryDelayMs(messageText) {
+  const msg = String(messageText || '').toLowerCase()
+  const match = msg.match(/try again in\s*(\d+)m(\d+)s/)
+  if (!match) return 4 * 60 * 1000
+
+  const mins = Number(match[1])
+  const secs = Number(match[2])
+  if (Number.isNaN(mins) || Number.isNaN(secs)) return 4 * 60 * 1000
+  return ((mins * 60) + secs) * 1000
+}
+
 export default function VoiceOrb({ studentId, onResult, speakText, onScheduleCreated }) {
-  const WAVE_BARS = [8, 14, 22, 16, 10, 18, 26, 20, 12, 18, 24, 17, 9]
   const [isRecording, setIsRecording] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -127,6 +154,10 @@ export default function VoiceOrb({ studentId, onResult, speakText, onScheduleCre
   const recordTimeout = useRef(null)
   const chunks = useRef([])
   const audioPlayer = useRef(new Audio())
+  const ttsInFlightRef = useRef(false)
+  const lastTtsAtRef = useRef(0)
+  const lastTtsTextRef = useRef('')
+  const ttsCooldownUntilRef = useRef(0)
 
   const clearRecordTimeout = () => {
     if (recordTimeout.current) {
@@ -154,19 +185,70 @@ export default function VoiceOrb({ studentId, onResult, speakText, onScheduleCre
   }
 
   const handleTTS = async (text) => {
-    if (!text) return
+    const normalizedText = String(text || '').trim()
+    if (!normalizedText) return
+
+    const now = Date.now()
+    const isDuplicate = normalizedText === lastTtsTextRef.current && (now - lastTtsAtRef.current) < 8000
+    const tooSoon = (now - lastTtsAtRef.current) < MIN_TTS_GAP_MS
+    if (ttsInFlightRef.current || isDuplicate || tooSoon) return
+
+    if (now < ttsCooldownUntilRef.current) {
+      setIsSpeaking(true)
+      const browserSpoken = speakWithBrowserTTS(normalizedText, () => setIsSpeaking(false))
+      if (browserSpoken) {
+        setVoiceError('Cloud voice cooling down. Using device voice temporarily.')
+        lastTtsAtRef.current = now
+        lastTtsTextRef.current = normalizedText
+      } else {
+        setIsSpeaking(false)
+      }
+      return
+    }
+
+    ttsInFlightRef.current = true
     setIsSpeaking(true)
+    setVoiceError('')
+
     try {
-      const audioUrl = await api.textToSpeech(text)
+      const audioUrl = await api.textToSpeech(normalizedText)
+
+      audioPlayer.current.pause()
+      audioPlayer.current.currentTime = 0
+
       audioPlayer.current.onended = null
       audioPlayer.current.onerror = null
       audioPlayer.current.src = audioUrl
       audioPlayer.current.play()
       audioPlayer.current.onended = () => setIsSpeaking(false)
       audioPlayer.current.onerror = () => setIsSpeaking(false)
+
+      lastTtsAtRef.current = Date.now()
+      lastTtsTextRef.current = normalizedText
     } catch (err) {
       console.error("TTS failed", err)
-      setIsSpeaking(false)
+      const message = String(err?.message || '').toLowerCase()
+      if (message.includes('429') || message.includes('too many requests')) {
+        ttsCooldownUntilRef.current = Date.now() + parseRetryDelayMs(err?.message)
+        const browserSpoken = speakWithBrowserTTS(normalizedText, () => setIsSpeaking(false))
+        if (browserSpoken) {
+          setVoiceError('Cloud voice is rate-limited. Using device voice temporarily.')
+        } else {
+          setVoiceError('Voice is rate-limited right now. Please try again in a few seconds.')
+        }
+      } else {
+        const browserSpoken = speakWithBrowserTTS(normalizedText, () => setIsSpeaking(false))
+        if (browserSpoken) {
+          setVoiceError('Cloud voice unavailable. Using device voice temporarily.')
+        } else {
+          setVoiceError('Voice playback failed. Please try again.')
+        }
+      }
+      if (!window?.speechSynthesis?.speaking) {
+        setIsSpeaking(false)
+      }
+    } finally {
+      ttsInFlightRef.current = false
     }
   }
 
@@ -317,67 +399,47 @@ export default function VoiceOrb({ studentId, onResult, speakText, onScheduleCre
     }
   }
 
-  const waveformStateClass = isRecording
-    ? 'voice-wave--recording'
-    : isProcessing
-      ? 'voice-wave--processing'
-    : isSpeaking
-      ? 'voice-wave--speaking'
-      : 'voice-wave--idle'
+  const isListeningState = isRecording || isProcessing
 
-  const statusText = isRecording
-    ? 'Listening'
-    : isProcessing
-      ? 'Thinking'
-    : isSpeaking
-      ? 'Speaking'
-      : 'Tap to talk'
+  const orbStateClass = isSpeaking
+    ? 'sensei-orb--speaking'
+    : isListeningState
+      ? 'sensei-orb--listening'
+      : 'sensei-orb--idle'
+
+  const statusText = isSpeaking
+    ? 'Sensei is speaking...'
+    : isListeningState
+      ? 'Listening...'
+      : 'Ask Sensei'
 
   return (
-    <div className="fixed bottom-3 md:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[min(84vw,30rem)] pointer-events-none">
+    <div className="fixed bottom-6 right-6 z-50 pointer-events-none flex flex-col items-center">
       <button
         type="button"
         onClick={toggleRecording}
         title={statusText}
-        className={`voice-wave-shell ${waveformStateClass} pointer-events-auto`}
+        className={`sensei-orb ${orbStateClass} pointer-events-auto`}
       >
-        <span className="voice-wave-panel" />
-
-        <span className="voice-wave-bars voice-wave-bars--left" aria-hidden="true">
-          {WAVE_BARS.map((height, idx) => (
-            <span
-              key={`left-${idx}`}
-              className="voice-wave-bar"
-              style={{ height: `${height}px`, animationDelay: `${idx * 0.05}s` }}
-            />
-          ))}
-        </span>
-
-        <span className="voice-wave-bars voice-wave-bars--right" aria-hidden="true">
-          {[...WAVE_BARS].reverse().map((height, idx) => (
-            <span
-              key={`right-${idx}`}
-              className="voice-wave-bar"
-              style={{ height: `${height}px`, animationDelay: `${idx * 0.05}s` }}
-            />
-          ))}
-        </span>
-
-        <span className="voice-wave-center">
-          {isSpeaking ? (
-            <SpeakerIcon className="h-5 w-5" />
-          ) : isRecording ? (
-            <MicIcon className="h-5 w-5" />
-          ) : isProcessing ? (
-            <SpeakerIcon className="h-5 w-5" />
-          ) : (
-            <MicIcon className="h-5 w-5" />
-          )}
-        </span>
+        {isSpeaking ? (
+          <SpeakerIcon className="h-7 w-7 text-white" />
+        ) : isListeningState ? (
+          <span className="sensei-listening-bars" aria-hidden="true">
+            <span className="sensei-listening-bar" />
+            <span className="sensei-listening-bar" />
+            <span className="sensei-listening-bar" />
+          </span>
+        ) : (
+          <MicIcon className="h-7 w-7 text-white" />
+        )}
       </button>
 
+      <p className={`mt-2 text-xs pointer-events-none ${isSpeaking ? 'text-[#10B981]' : isListeningState ? 'text-[#3B82F6]' : 'text-[#4B5563]'}`}>
+        {statusText}
+      </p>
+
       {voiceError && (
-        <p className="mt-1 text-center text-[11px] text-rose-300 pointer-events-none">{voiceError}</p>
+        <p className="mt-1 max-w-[220px] text-center text-[11px] text-rose-300 pointer-events-none">{voiceError}</p>
       )}
     </div>
   )

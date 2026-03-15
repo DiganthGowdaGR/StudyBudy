@@ -11,6 +11,10 @@ export default function TeacherSubjects() {
   const [session, setSession] = useState(() => getTeacherSession())
 
   useEffect(() => {
+    document.title = 'StudyBuddy — Teacher Portal'
+  }, [])
+
+  useEffect(() => {
     if (!session?.teacher_id) {
       navigate('/teacher/login', { replace: true })
       return
