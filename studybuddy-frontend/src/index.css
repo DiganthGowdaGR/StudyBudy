@@ -380,3 +380,8 @@ input:focus, textarea:focus, select:focus {
 .sensei-listening-bar:nth-child(3) {
   animation-delay: 0.18s;
 }
+
+@keyframes wave {
+  from { transform: scaleY(0.4); }
+  to { transform: scaleY(1); }
+}

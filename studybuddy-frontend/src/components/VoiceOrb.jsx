@@ -149,6 +149,7 @@ export default function VoiceOrb({ studentId, onResult, speakText, onScheduleCre
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [voiceError, setVoiceError] = useState('')
+  const [contentCenterLeft, setContentCenterLeft] = useState('50vw')
   const mediaRecorder = useRef(null)
   const activeStream = useRef(null)
   const recordTimeout = useRef(null)
@@ -197,10 +198,11 @@ export default function VoiceOrb({ studentId, onResult, speakText, onScheduleCre
       setIsSpeaking(true)
       const browserSpoken = speakWithBrowserTTS(normalizedText, () => setIsSpeaking(false))
       if (browserSpoken) {
-        setVoiceError('Cloud voice cooling down. Using device voice temporarily.')
+        console.log('TTS fallback: using device voice')
         lastTtsAtRef.current = now
         lastTtsTextRef.current = normalizedText
       } else {
+        setVoiceError('Voice playback failed. Please try again.')
         setIsSpeaking(false)
       }
       return
@@ -232,14 +234,14 @@ export default function VoiceOrb({ studentId, onResult, speakText, onScheduleCre
         ttsCooldownUntilRef.current = Date.now() + parseRetryDelayMs(err?.message)
         const browserSpoken = speakWithBrowserTTS(normalizedText, () => setIsSpeaking(false))
         if (browserSpoken) {
-          setVoiceError('Cloud voice is rate-limited. Using device voice temporarily.')
+          console.log('TTS fallback: using device voice')
         } else {
-          setVoiceError('Voice is rate-limited right now. Please try again in a few seconds.')
+          setVoiceError('Voice playback failed. Please try again.')
         }
       } else {
         const browserSpoken = speakWithBrowserTTS(normalizedText, () => setIsSpeaking(false))
         if (browserSpoken) {
-          setVoiceError('Cloud voice unavailable. Using device voice temporarily.')
+          console.log('TTS fallback: using device voice')
         } else {
           setVoiceError('Voice playback failed. Please try again.')
         }
@@ -261,6 +263,62 @@ export default function VoiceOrb({ studentId, onResult, speakText, onScheduleCre
       if (recorder && recorder.state !== 'inactive') {
         recorder.stop()
       }
+    }
+  }, [])
+
+  useEffect(() => {
+    const anchorSelector = '[data-workspace-center-anchor="true"]'
+    let resizeObserver = null
+    let retryInterval = null
+
+    const updateCenter = () => {
+      const anchor = document.querySelector(anchorSelector)
+      if (!anchor) return false
+
+      const rect = anchor.getBoundingClientRect()
+      if (rect.width <= 0) return false
+
+      setContentCenterLeft(`${rect.left + (rect.width / 2)}px`)
+      return true
+    }
+
+    const bindObserver = () => {
+      const anchor = document.querySelector(anchorSelector)
+      if (!anchor) return false
+
+      if (typeof ResizeObserver !== 'undefined') {
+        resizeObserver?.disconnect()
+        resizeObserver = new ResizeObserver(() => {
+          updateCenter()
+        })
+        resizeObserver.observe(anchor)
+      }
+
+      updateCenter()
+      return true
+    }
+
+    const onResize = () => {
+      updateCenter()
+    }
+
+    window.addEventListener('resize', onResize)
+
+    if (!bindObserver()) {
+      retryInterval = window.setInterval(() => {
+        if (bindObserver()) {
+          window.clearInterval(retryInterval)
+          retryInterval = null
+        }
+      }, 250)
+    }
+
+    return () => {
+      window.removeEventListener('resize', onResize)
+      if (retryInterval) {
+        window.clearInterval(retryInterval)
+      }
+      resizeObserver?.disconnect()
     }
   }, [])
 
@@ -401,6 +459,35 @@ export default function VoiceOrb({ studentId, onResult, speakText, onScheduleCre
 
   const isListeningState = isRecording || isProcessing
 
+  function WaveformBars({ color, speed }) {
+    const bars = [3, 5, 8, 6, 10, 7, 4, 9, 6, 8, 5, 3]
+
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '3px',
+          height: '40px',
+        }}
+      >
+        {bars.map((h, i) => (
+          <div
+            key={i}
+            style={{
+              width: '3px',
+              height: `${h * 3}px`,
+              background: color,
+              borderRadius: '999px',
+              animation: `wave ${speed + (i * 0.1)}s ease-in-out infinite alternate`,
+              animationDelay: `${i * 0.05}s`,
+            }}
+          />
+        ))}
+      </div>
+    )
+  }
+
   const orbStateClass = isSpeaking
     ? 'sensei-orb--speaking'
     : isListeningState
@@ -413,34 +500,89 @@ export default function VoiceOrb({ studentId, onResult, speakText, onScheduleCre
       ? 'Listening...'
       : 'Ask Sensei'
 
-  return (
-    <div className="fixed bottom-6 right-6 z-50 pointer-events-none flex flex-col items-center">
-      <button
-        type="button"
-        onClick={toggleRecording}
-        title={statusText}
-        className={`sensei-orb ${orbStateClass} pointer-events-auto`}
-      >
-        {isSpeaking ? (
-          <SpeakerIcon className="h-7 w-7 text-white" />
-        ) : isListeningState ? (
-          <span className="sensei-listening-bars" aria-hidden="true">
-            <span className="sensei-listening-bar" />
-            <span className="sensei-listening-bar" />
-            <span className="sensei-listening-bar" />
-          </span>
-        ) : (
-          <MicIcon className="h-7 w-7 text-white" />
-        )}
-      </button>
+  const contentAreaCenterLeft = contentCenterLeft
+  const isSpeakingState = isSpeaking
+  const waveformColor = isSpeakingState ? '#2DD4BF' : '#6366F1'
+  const labelText = isSpeakingState
+    ? 'Speaking'
+    : isListeningState
+      ? 'Listening...'
+      : 'Ask Sensei'
+  const speed = isSpeakingState ? 0.8 : 0.4
 
-      <p className={`mt-2 text-xs pointer-events-none ${isSpeaking ? 'text-[#10B981]' : isListeningState ? 'text-[#3B82F6]' : 'text-[#4B5563]'}`}>
-        {statusText}
-      </p>
+  return (
+    <>
+      <div
+        style={{
+          position: 'fixed',
+          bottom: '80px',
+          left: contentAreaCenterLeft,
+          transform: 'translateX(-50%)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          background: 'rgba(15, 20, 30, 0.85)',
+          backdropFilter: 'blur(12px)',
+          borderRadius: '999px',
+          padding: isListeningState || isSpeakingState ? '12px 20px' : '10px 14px',
+          border: '1px solid rgba(255,255,255,0.1)',
+        }}
+      >
+        {(isListeningState || isSpeakingState) && (
+          <WaveformBars color={waveformColor} speed={speed} />
+        )}
+
+        <button
+          type="button"
+          onClick={toggleRecording}
+          style={{
+            width: '44px',
+            height: '44px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: '0 0 20px rgba(99,102,241,0.5)',
+            flexShrink: 0,
+            border: 'none',
+            color: '#ffffff',
+          }}
+          title={statusText}
+        >
+          {isSpeakingState ? '🔊' : '🎙️'}
+        </button>
+
+        {(isListeningState || isSpeakingState) && (
+          <WaveformBars color={waveformColor} speed={speed} />
+        )}
+      </div>
+
+      <div
+        style={{
+          position: 'fixed',
+          bottom: '56px',
+          left: contentAreaCenterLeft,
+          transform: 'translateX(-50%)',
+          fontSize: '11px',
+          color: '#4B5563',
+          letterSpacing: '0.05em',
+          zIndex: 1000,
+        }}
+      >
+        {labelText}
+      </div>
 
       {voiceError && (
-        <p className="mt-1 max-w-[220px] text-center text-[11px] text-rose-300 pointer-events-none">{voiceError}</p>
+        <p
+          className="fixed bottom-[30px] z-[1000] max-w-[320px] -translate-x-1/2 text-center text-[11px] text-rose-300 pointer-events-none"
+          style={{ left: contentAreaCenterLeft }}
+        >
+          {voiceError}
+        </p>
       )}
-    </div>
+    </>
   )
 }
