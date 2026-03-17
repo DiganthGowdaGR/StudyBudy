@@ -969,7 +969,7 @@ export default function MainApp() {
   }
 
   return (
-    <div className="h-screen w-full bg-[#080B14] text-[#94A3B8] overflow-hidden">
+    <div className="min-h-screen w-full bg-[#080B14] text-[#94A3B8] overflow-hidden">
       {mobileSidebarOpen && (
         <button
           type="button"
@@ -1119,8 +1119,8 @@ export default function MainApp() {
         </div>
       )}
 
-      <main className="h-screen pt-[52px] md:ml-[220px]">
-        <div className="h-[calc(100vh-52px)] overflow-hidden bg-[#080B14]">
+      <div className="mt-[52px] w-full min-h-[calc(100vh-52px)] bg-[#080B14] md:ml-[220px] md:w-[calc(100%-220px)]">
+        <main className="h-[calc(100vh-52px)] w-full overflow-hidden">
           {activeTab === 'home' && (
             <HomeView
               studentName={student.name}
@@ -1191,8 +1191,8 @@ export default function MainApp() {
               onDeleteEvent={handleDeleteScheduleEvent}
             />
           )}
-        </div>
-      </main>
+        </main>
+      </div>
 
       {isWorkspaceTab && faceDetectionOn && (
         <FaceDetectionPip
