@@ -237,11 +237,30 @@ export default function WorkspaceView({
   const workspaceLabel = workspaceName || 'General'
 
   return (
-    <div className="h-full flex bg-[#070912] text-slate-200">
+    <div
+      className="bg-[#070912] text-slate-200"
+      style={{
+        display: 'flex',
+        height: 'calc(100vh - 52px)',
+        overflow: 'hidden',
+        width: '100%',
+      }}
+    >
       <aside
-        className={`border-r border-[#131933] bg-[#0a0d19] transition-all duration-300 shadow-[inset_-1px_0_0_rgba(99,102,241,0.08)] ${
-          isSourcesCollapsed ? 'w-[76px]' : 'w-[19.5rem]'
-        }`}
+        className="border-r border-[#131933] bg-[#0a0d19] transition-all duration-300 shadow-[inset_-1px_0_0_rgba(99,102,241,0.08)]"
+        style={isSourcesCollapsed
+          ? {
+              width: '76px',
+              minWidth: '76px',
+              height: '100%',
+              overflowY: 'auto',
+            }
+          : {
+              width: '260px',
+              minWidth: '260px',
+              height: '100%',
+              overflowY: 'auto',
+            }}
       >
         <input
           id="workspace-upload-file"
@@ -437,12 +456,30 @@ export default function WorkspaceView({
         )}
       </aside>
 
-      <main className="relative flex-1 overflow-y-auto bg-gradient-to-br from-[#070912] via-[#080c18] to-[#0a0f1e] p-6 pb-44 md:pb-36 flex items-start justify-center">
+      <main
+        data-workspace-center-anchor="true"
+        className="relative flex-1 flex items-start justify-center bg-[#0D1117]"
+        style={{
+          height: '100%',
+          overflowY: 'auto',
+          padding: '24px',
+        }}
+      >
         <div className="absolute inset-0 bg-grid-pattern opacity-25 pointer-events-none" />
         <A4Sheet title={activeTitle} notes={activeNotes} />
       </main>
 
-      <aside className="w-80 bg-[#0c0f1a] border-l border-[#131933] flex flex-col shadow-[inset_1px_0_0_rgba(99,102,241,0.08)]">
+      <aside
+        className="bg-[#0c0f1a] border-l border-[#131933] flex flex-col shadow-[inset_1px_0_0_rgba(99,102,241,0.08)]"
+        style={{
+          width: '320px',
+          minWidth: '320px',
+          height: '100%',
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <div className="h-14 border-b border-[#131933] px-4 flex items-center justify-between bg-[#0f1324]">
           <p className="text-sm font-semibold text-white">Sensei AI</p>
           <span className="h-2 w-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.6)]" />
